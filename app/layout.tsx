@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
 
-const dmSans = DM_Sans({
+const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} antialiased`}>
+    <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
+      <body className={`antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
