@@ -1,0 +1,22 @@
+import { notFound } from "next/navigation";
+import { isLocale } from "@/lib/i18n";
+
+type LayoutParams = { lang?: string };
+
+export default async function LangLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<LayoutParams> | LayoutParams;
+}) {
+  const resolvedParams = await Promise.resolve(params);
+  const lang = resolvedParams?.lang;
+
+  if (!isLocale(lang)) {
+    notFound();
+  }
+
+  // Do NOT render <html>/<body> here since RootLayout already owns those tags.
+  return children;
+}
