@@ -1,13 +1,19 @@
+"use client";
+
+import { useState } from "react";
 import {
   IconBook,
   IconDoorExit,
   IconGardenCart,
   IconGlobe,
   IconHome,
+  IconMenu2,
   IconPackageImport,
   IconSearch,
   IconSettings,
   IconUser,
+  IconX,
+  IconChevronRight,
 } from "@tabler/icons-react";
 import { ModeToggle } from "./mode-toggle";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
@@ -23,107 +29,415 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "./ui/sheet";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
+import { usePathname, useRouter } from "next/navigation";
+import { dict } from "@/lib/dict";
+import { cn } from "@/lib/utils";
+import { Badge } from "./ui/badge";
+
+const LOCALE_TO_SELECT_VALUE = {
+  en: "EN",
+  ja: "JA",
+} as const;
+
+const SELECT_VALUE_TO_LOCALE = {
+  EN: "en",
+  JA: "ja",
+} as const;
+
+function getLocaleFromPathname(pathname: string) {
+  const seg = pathname.split("/")[1];
+  return seg === "en" || seg === "ja" ? seg : null;
+}
+
+function replaceLocaleInPathname(pathname: string, nextLocale: "en" | "ja") {
+  const parts = pathname.split("/");
+  const current = parts[1];
+
+  if (current === "en" || current === "ja") {
+    parts[1] = nextLocale;
+    return parts.join("/") || "/";
+  }
+
+  return `/${nextLocale}`;
+}
 
 export default function Navbar() {
-  return (
-    <header className="w-full backdrop-blur-3xl fixed top-0 bg-background/50 z-50">
-      <nav className="w-[80%] mx-auto flex items-center justify-between p-2">
-        <div className="flex items-center gap-5">
-          <h2>Kairo</h2>
-          <Separator orientation="vertical" />
-          <ul className="flex items-center gap-2">
-            <li>
-              <Link
-                href={"/"}
-                className="hover:text-primary flex items-center gap-1 animate transition-colors duration-300 ease-in-out"
-              >
-                <IconHome size={20} /> Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/"}
-                className="hover:text-primary flex items-center gap-1 animate transition-colors duration-300 ease-in-out"
-              >
-                <IconGlobe size={20} /> Browse
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/"}
-                className="hover:text-primary flex items-center gap-1 animate transition-colors duration-300 ease-in-out"
-              >
-                <IconPackageImport size={20} /> New Arrivals
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/"}
-                className="hover:text-primary flex items-center gap-1"
-              >
-                <IconBook size={20} /> Philosophy
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div className="flex items-center gap-2">
-          <InputGroup>
-            <InputGroupAddon>
-              <IconSearch />
-            </InputGroupAddon>
-            <InputGroupInput
-              size={20}
-              placeholder="Search..."
-              className="outline-none text-xs"
-            />
-          </InputGroup>
-          <Select defaultValue="EN">
-            <SelectTrigger size="default">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="EN">EN</SelectItem>
-              <SelectItem value="JP">JP</SelectItem>
-            </SelectContent>
-          </Select>
-          <ModeToggle />
-          <Button size="icon" variant={"outline"}>
-            <IconGardenCart />
-          </Button>
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-          <DropdownMenu>
-            <DropdownMenuTrigger className={"outline-none"}>
-              <Avatar>
-                <Avatar>
+  const currentLocale = pathname ? getLocaleFromPathname(pathname) : null;
+  const lang = currentLocale ?? "en";
+  const t = dict[lang].navbar;
+
+  const selectValue =
+    (currentLocale && LOCALE_TO_SELECT_VALUE[currentLocale]) ?? "EN";
+
+  type LangSelectValue = keyof typeof SELECT_VALUE_TO_LOCALE;
+
+  const handleLangChange = (value: LangSelectValue | null) => {
+    if (!value) return;
+
+    const nextLocale = SELECT_VALUE_TO_LOCALE[value];
+    const nextPath = replaceLocaleInPathname(pathname ?? "/", nextLocale);
+    router.push(nextPath);
+  };
+
+  const navLinks = [
+    { href: `/${lang}`, label: t.links.home, icon: IconHome },
+    { href: `/${lang}/browse`, label: t.links.browse, icon: IconGlobe },
+    {
+      href: `/${lang}/new-arrivals`,
+      label: t.links.newArrivals,
+      icon: IconPackageImport,
+    },
+    {
+      href: `/${lang}/philosophy`,
+      label: t.links.philosophy,
+      icon: IconBook,
+    },
+  ];
+
+  const isActiveLink = (href: string) => {
+    if (href === `/${lang}`) {
+      return pathname === `/${lang}` || pathname === `/${lang}/`;
+    }
+    return pathname?.startsWith(href);
+  };
+
+  // Close sheet and navigate
+  const handleNavClick = (href: string) => {
+    setIsSheetOpen(false);
+    router.push(href);
+  };
+
+  return (
+    <header className="w-full backdrop-blur-xl fixed top-0 bg-background/40 z-50 transition-all border-b border-border/50">
+      <nav className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center gap-4 lg:gap-6">
+            <Link
+              href={`/${lang}`}
+              className="font-semibold text-base sm:text-lg tracking-tight hover:opacity-80 transition-opacity shrink-0"
+            >
+              {t.brand}
+            </Link>
+
+            <Separator orientation="vertical" />
+
+            {/* Desktop Navigation */}
+            <ul className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive = isActiveLink(link.href);
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                      )}
+                    >
+                      <Icon size={18} />
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* RIGHT: Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Desktop Search */}
+            <InputGroup className="bg-background hidden md:flex h-9 border rounded-md">
+              <InputGroupAddon>
+                <IconSearch size={16} className="text-muted-foreground" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder={t.searchPlaceholder}
+                className="outline-none text-sm w-40 lg:w-56"
+              />
+            </InputGroup>
+
+            {/* Mobile/Tablet Search Button */}
+            <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+              <DialogTrigger
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                  "h-9 w-9 md:hidden",
+                )}
+              >
+                <IconSearch size={20} />
+                <span className="sr-only">Search</span>
+              </DialogTrigger>
+              <DialogContent className="top-4 translate-y-0 sm:top-[50%] sm:translate-y-[-50%]">
+                <DialogTitle className="sr-only">Search</DialogTitle>
+                <div className="flex items-center gap-2">
+                  <IconSearch
+                    size={20}
+                    className="text-muted-foreground shrink-0"
+                  />
+                  <Input
+                    placeholder={t.searchPlaceholder}
+                    className="border-0 focus-visible:ring-0 text-base"
+                    autoFocus
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Desktop Language Selector */}
+            <div className="hidden sm:block">
+              <Select value={selectValue} onValueChange={handleLangChange}>
+                <SelectTrigger className="bg-background h-9 w-17.5 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EN">{t.language.en}</SelectItem>
+                  <SelectItem value="JA">{t.language.ja}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Theme Toggle */}
+            <ModeToggle />
+
+            {/* Cart */}
+            <Button size="icon" variant="outline" className="relative">
+              <IconGardenCart size={20} />
+              <Badge className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
+                0
+              </Badge>
+              <span className="sr-only">Cart</span>
+            </Button>
+
+            {/* User Menu - Desktop/Tablet */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="outline-none hidden sm:flex items-center justify-center rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                <Avatar className="transition-transform hover:scale-105 rounded-none">
                   <AvatarImage
                     src="https://github.com/shadcn.png"
                     alt="@shadcn"
-                    className="rounded-none"
+                    className={"rounded-none"}
                   />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback className={"rounded-none"}>CN</AvatarFallback>
                 </Avatar>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <IconUser />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconSettings />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
-                <IconDoorExit />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-1.5 py-1">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">shadcn</p>
+                    <p className="text-xs text-muted-foreground">
+                      m@example.com
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <IconUser className="mr-2 h-4 w-4" />
+                    {t.userMenu.account}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <IconSettings className="mr-2 h-4 w-4" />
+                    {t.userMenu.settings}
+                  </DropdownMenuItem>
+                </>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  className="cursor-pointer"
+                >
+                  <IconDoorExit className="mr-2 h-4 w-4" />
+                  {t.userMenu.logout}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Mobile Menu - Sheet */}
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetTrigger
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                  "h-9 w-9 lg:hidden",
+                )}
+              >
+                <IconMenu2 size={20} />
+                <span className="sr-only">Open menu</span>
+              </SheetTrigger>
+
+              <SheetContent side="right" className="w-full sm:w-80 p-0">
+                <SheetHeader className="p-4 border-b">
+                  <div className="flex items-center justify-between">
+                    <SheetTitle className="text-left">{t.brand}</SheetTitle>
+                    <SheetClose
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-8 w-8",
+                      )}
+                    >
+                      <IconX size={18} />
+                      <span className="sr-only">Close</span>
+                    </SheetClose>
+                  </div>
+                </SheetHeader>
+
+                <div className="flex flex-col h-[calc(100vh-65px)]">
+                  {/* User Profile Section - Mobile Only */}
+                  <button
+                    type="button"
+                    className="p-4 border-b sm:hidden text-left hover:bg-accent/50 transition-colors"
+                    onClick={() => handleNavClick(`/${lang}/account`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage
+                          src="https://github.com/shadcn.png"
+                          alt="@shadcn"
+                          className={"rounded-none"}
+                        />
+                        <AvatarFallback className="rounded-none">
+                          CN
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">shadcn</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          m@example.com
+                        </p>
+                      </div>
+                      <IconChevronRight
+                        size={16}
+                        className="text-muted-foreground"
+                      />
+                    </div>
+                  </button>
+
+                  {/* Navigation Links */}
+                  <div className="flex-1 overflow-y-auto">
+                    <nav className="p-2">
+                      <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Navigation
+                      </p>
+                      {navLinks.map((link) => {
+                        const Icon = link.icon;
+                        const isActive = isActiveLink(link.href);
+                        return (
+                          <button
+                            key={link.href}
+                            type="button"
+                            onClick={() => handleNavClick(link.href)}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors text-left",
+                              isActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-foreground hover:bg-accent",
+                            )}
+                          >
+                            <Icon size={20} />
+                            {link.label}
+                            {isActive && (
+                              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </nav>
+
+                    <Separator className="my-2" />
+
+                    {/* Settings Section */}
+                    <div className="p-2">
+                      <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Settings
+                      </p>
+
+                      {/* Language Selector - Mobile */}
+                      <div className="px-3 py-3 sm:hidden">
+                        <p className="text-sm font-medium mb-2">Language</p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant={
+                              selectValue === "EN" ? "default" : "outline"
+                            }
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleLangChange("EN")}
+                          >
+                            English
+                          </Button>
+                          <Button
+                            variant={
+                              selectValue === "JA" ? "default" : "outline"
+                            }
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleLangChange("JA")}
+                          >
+                            日本語
+                          </Button>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleNavClick(`/${lang}/account`)}
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent text-left"
+                      >
+                        <IconUser size={20} />
+                        {t.userMenu.account}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleNavClick(`/${lang}/settings`)}
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent text-left"
+                      >
+                        <IconSettings size={20} />
+                        {t.userMenu.settings}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Logout Button - Bottom */}
+                  <div className="p-4 border-t mt-auto">
+                    <Button
+                      variant="destructive"
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setIsSheetOpen(false);
+                        // Handle logout logic here
+                      }}
+                    >
+                      <IconDoorExit className="mr-2 h-4 w-4" />
+                      {t.userMenu.logout}
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </nav>
     </header>
