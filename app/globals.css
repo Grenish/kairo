@@ -135,4 +135,5 @@
     --background-image-kairo-light: url("/kairo-light.png");
     --background-image-kairo-dark: url("/kairo-night.png");
     --background-image-smooth: url("/smooth.png");
+    --spacing-8xl: 1650px;
 }
