@@ -15,10 +15,10 @@ export default function Hero({ t }: { t: HeroText }) {
   return (
     <div className="h-svh w-full flex items-center justify-center relative bg-smooth bg-cover overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0 block">
-        <div className="absolute inset-0 dark:bg-black/50 bg-white/50 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-amber-200/10 mix-blend-overlay sepia-[0.35] contrast-[1.08] saturate-[0.85]" />
-        <div className="absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.35)_70%,rgba(0,0,0,0.6)_100%)]" />
-        <div className="absolute inset-0 opacity-[0.07] bg-[repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_3px)] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-stone-100/10 dark:bg-black/20 transition-colors duration-500" />
+        <div className="absolute inset-0 mix-blend-overlay bg-orange-200/30 dark:bg-amber-500/10 sepia-[0.3] dark:sepia-[0.5] contrast-[1.1]" />
+        <div className="absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.1)_60%,rgba(0,0,0,0.4)_100%)] dark:[background:radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.35)_70%,rgba(0,0,0,0.8)_100%)]" />
+        <div className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08] bg-[repeating-linear-gradient(0deg,rgba(0,0,0,0.1)_0px,rgba(0,0,0,0.1)_1px,transparent_1px,transparent_3px)] dark:bg-[repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_3px)] mix-blend-overlay" />
       </div>
 
       <h2 className="hidden lg:block absolute bottom-32 z-50 right-0 xl:-right-4 -rotate-90 opacity-50 text-sm tracking-widest whitespace-nowrap origin-bottom-right">
@@ -40,7 +40,7 @@ export default function Hero({ t }: { t: HeroText }) {
           {t.title}
         </h2>
 
-        <p className="mt-4 sm:mt-6 w-11/12 md:w-3/4 lg:w-1/2 text-sm sm:text-base text-muted-foreground">
+        <p className="mt-4 sm:mt-6 w-11/12 md:w-3/4 lg:w-1/2 text-sm sm:text-base font-thin">
           {t.description}
         </p>
 
