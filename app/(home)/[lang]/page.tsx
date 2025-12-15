@@ -1,5 +1,6 @@
 import CategorySection from "@/components/category-section";
 import Hero from "@/components/hero";
+import Philosophy from "@/components/philosophy";
 import ProductSample from "@/components/products-sample";
 import { dict } from "@/lib/dict";
 import { notFound } from "next/navigation";
@@ -20,7 +21,8 @@ export default async function Page({
     <>
       <Hero t={dict[lang].hero} />
       <CategorySection t={dict[lang].categorySection} />
-      <ProductSample />
+      <Philosophy t={dict[lang].philosophySection} />
+      <ProductSample t={dict[lang].productsSample} />
     </>
   );
 }
