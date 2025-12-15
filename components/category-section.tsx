@@ -12,16 +12,19 @@ type CategoryItem = {
 
 type CategorySectionText = {
   title: string;
+  description: string;
   cta: string;
-  categories: CategoryItem[];
+  categories: readonly CategoryItem[];
 };
 
 export default function CategorySection({ t }: { t: CategorySectionText }) {
   return (
     <div className="w-full">
       <div className="w-[80%] mx-auto py-5">
-        <h2 className="text-center text-3xl font-semibold mb-5">{t.title}</h2>
-
+        <h2 className="text-center text-3xl font-semibold">{t.title}</h2>
+        <p className="text-lg font-thin text-center mt-2 mb-5">
+          {t.description}
+        </p>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {t.categories.map(({ id, img, alt, href, headline }) => (
             <div key={id} className="relative group overflow-hidden">
