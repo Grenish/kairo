@@ -31,6 +31,8 @@ export const dict = {
     },
     categorySection: {
       title: "Shop Category",
+      description:
+        "Shop by category to navigate our collection with clarity and purpose.",
       cta: "Shop",
       categories: [
         {
@@ -62,6 +64,64 @@ export const dict = {
           headline: "Women’s Tops",
         },
       ],
+    },
+    productsSample: {
+      title: "New Arrivals",
+      description:
+        "Browse our most recent arrivals, featuring updated designs and refined craftsmanship.",
+      addToCart: "Add to Cart",
+      products: [
+        {
+          id: "1",
+          title: "Shinkai Modern Tailored Suit",
+          description: "Woman's Suit",
+          price: 68000,
+          sizes: ["XS", "S", "M", "XL"],
+          images: [
+            "/products/shinkai-modern-tailored-suit-1.png",
+            "/products/shinkai-modern-tailored-suit-2.png",
+          ],
+        },
+        {
+          id: "2",
+          title: "Kage Form Knit Sweater",
+          description: "Woman's Sweater",
+          price: 29500,
+          sizes: ["XS", "S", "M", "XL"],
+          images: [
+            "/products/kage-form-knit-sweater-2.png",
+            "/products/kage-form-knit-sweater-1.png",
+          ],
+        },
+        {
+          id: "3",
+          title: "Sora Heavyweight T-Shirt",
+          description: "Man's Tshirt",
+          price: 12800,
+          sizes: ["XS", "S", "M"],
+          images: [
+            "/products/sora-heavyweight-tshirt-2.png",
+            "/products/sora-heavyweight-tshirt-1.png",
+          ],
+        },
+        {
+          id: "4",
+          title: "Kuro Utility Cargo Pants",
+          description: "Man's Pants",
+          price: 12800,
+          sizes: ["S", "L", "M"],
+          images: [
+            "/products/kuro-utility-cargo-pants-2.png",
+            "/products/kuro-utility-cargo-pants-1.png",
+          ],
+        },
+      ],
+    },
+    philosophySection: {
+      title: "Quiet Luxury",
+      description:
+        "Refined silhouettes defined by quality and subtle confidence",
+      cta: "Know about us",
     },
   },
   ja: {
@@ -96,6 +156,8 @@ export const dict = {
     },
     categorySection: {
       title: "カテゴリーから探す",
+      description:
+        "カテゴリー別に商品を探して、明確で効率的にコレクションをご覧ください。",
       cta: "見る",
       categories: [
         {
@@ -127,6 +189,63 @@ export const dict = {
           headline: "トップス",
         },
       ],
+    },
+    productsSample: {
+      title: "新着アイテム",
+      description:
+        "最新のデザインと洗練された職人技が光る、最新の入荷商品をご覧ください。",
+      addToCart: "カートに入れる",
+      products: [
+        {
+          id: "1",
+          title: "深海モダンテーラードスーツ",
+          description: "レディーススーツ",
+          price: 68000,
+          sizes: ["XS", "S", "M", "XL"],
+          images: [
+            "/products/shinkai-modern-tailored-suit-1.png",
+            "/products/shinkai-modern-tailored-suit-2.png",
+          ],
+        },
+        {
+          id: "2",
+          title: "影フォルムニットセーター",
+          description: "レディースセーター",
+          price: 29500,
+          sizes: ["XS", "S", "M", "XL"],
+          images: [
+            "/products/kage-form-knit-sweater-2.png",
+            "/products/kage-form-knit-sweater-1.png",
+          ],
+        },
+        {
+          id: "3",
+          title: "空ヘビーウェイトTシャツ",
+          description: "メンズTシャツ",
+          price: 12800,
+          sizes: ["XS", "S", "M"],
+          images: [
+            "/products/sora-heavyweight-tshirt-2.png",
+            "/products/sora-heavyweight-tshirt-1.png",
+          ],
+        },
+        {
+          id: "4",
+          title: "黒ユーティリティカーゴパンツ",
+          description: "メンズパンツ",
+          price: 12800,
+          sizes: ["S", "L", "M"],
+          images: [
+            "/products/kuro-utility-cargo-pants-2.png",
+            "/products/kuro-utility-cargo-pants-1.png",
+          ],
+        },
+      ],
+    },
+    philosophySection: {
+      title: "静かなる贅沢",
+      description: "質とさりげない自信によって定義される、洗練されたシルエット",
+      cta: "私たちについて",
     },
   },
 } as const;
