@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
+import LenisProvider from "@/components/lenis-provider";
 
 type LayoutParams = { lang?: string };
 
@@ -18,5 +19,5 @@ export default async function LangLayout({
   }
 
   // Do NOT render <html>/<body> here since RootLayout already owns those tags.
-  return children;
+  return <LenisProvider>{children}</LenisProvider>;
 }
