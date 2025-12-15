@@ -120,6 +120,7 @@
     * {
         @apply border-border outline-ring/50;
         @apply border-border outline-ring/50;
+        @apply scroll-smooth duration-500;
     }
     body {
         @apply bg-background text-foreground;
@@ -136,4 +137,5 @@
     --background-image-kairo-dark: url("/kairo-night.png");
     --background-image-smooth: url("/smooth.png");
     --spacing-8xl: 1650px;
+    --background-image-models: url("/models-bg.png");
 }
