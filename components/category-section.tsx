@@ -17,7 +17,13 @@ type CategorySectionText = {
   categories: readonly CategoryItem[];
 };
 
-export default function CategorySection({ t }: { t: CategorySectionText }) {
+export default function CategorySection({
+  t,
+  lang,
+}: {
+  t: CategorySectionText;
+  lang: string;
+}) {
   return (
     <div className="w-full">
       <div className="w-[80%] mx-auto py-5">
@@ -42,7 +48,7 @@ export default function CategorySection({ t }: { t: CategorySectionText }) {
                 </h2>
 
                 <Link
-                  href={href}
+                  href={`/${lang}${href}`}
                   className="mt-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-100"
                 >
                   <Button variant="secondary" size="sm" className="w-24">

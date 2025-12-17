@@ -13,7 +13,7 @@ type HeroText = {
 
 export default function Hero({ t }: { t: HeroText }) {
   return (
-    <div className="h-svh w-full flex items-center justify-center relative bg-smooth bg-cover overflow-hidden">
+    <div className="h-svh w-full flex items-center justify-center relative bg-smooth bg-cover bg-fixed overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0 block">
         <div className="absolute inset-0 bg-stone-100/10 dark:bg-black/20 transition-colors duration-500" />
         <div className="absolute inset-0 mix-blend-overlay bg-orange-200/30 dark:bg-amber-500/10 sepia-[0.3] dark:sepia-[0.5] contrast-[1.1]" />

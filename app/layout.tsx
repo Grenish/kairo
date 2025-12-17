@@ -2,14 +2,8 @@ import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Navbar from "@/components/navbar";
-import LenisProvider from "@/components/lenis-provider";
 
-const nunitoSans = Nunito_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
+const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Kairo",
@@ -30,7 +24,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
           {children}
         </ThemeProvider>
       </body>

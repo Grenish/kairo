@@ -41,8 +41,13 @@ import {
   SheetTrigger,
   SheetClose,
 } from "./ui/sheet";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "./ui/dialog";
-import { Input } from "./ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogHeader,
+} from "./ui/dialog";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
 import { usePathname, useRouter } from "next/navigation";
@@ -92,8 +97,12 @@ export default function Navbar() {
 
   type LangSelectValue = keyof typeof SELECT_VALUE_TO_LOCALE;
 
-  const handleLangChange = (value: LangSelectValue | null) => {
-    if (!value) return;
+  const isValidLangSelectValue = (value: string): value is LangSelectValue => {
+    return value in SELECT_VALUE_TO_LOCALE;
+  };
+
+  const handleLangChange = (value: string) => {
+    if (!value || !isValidLangSelectValue(value)) return;
 
     const nextLocale = SELECT_VALUE_TO_LOCALE[value];
     const nextPath = replaceLocaleInPathname(pathname ?? "/", nextLocale);
@@ -122,27 +131,25 @@ export default function Navbar() {
     return pathname?.startsWith(href);
   };
 
-  // Close sheet and navigate
   const handleNavClick = (href: string) => {
     setIsSheetOpen(false);
     router.push(href);
   };
 
   return (
-    <header className="w-full backdrop-blur-xl fixed top-0 bg-background/40 z-50 transition-all border-b border-border/50">
+    <header className="w-full backdrop-blur-xl fixed top-0 bg-background/40 z-50 border-b border-border/50">
       <nav className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-4 lg:gap-6">
             <Link
               href={`/${lang}`}
-              className="font-semibold text-base sm:text-lg tracking-tight hover:opacity-80 transition-opacity shrink-0"
+              className="font-semibold text-base sm:text-lg tracking-tight shrink-0"
             >
               {t.brand}
             </Link>
 
             <Separator orientation="vertical" />
 
-            {/* Desktop Navigation */}
             <ul className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
@@ -152,10 +159,8 @@ export default function Navbar() {
                     <Link
                       href={link.href}
                       className={cn(
-                        "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : " font-thin hover:text-foreground hover:bg-accent",
+                        "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium",
+                        isActive ? "bg-primary/10 text-primary" : "font-thin",
                       )}
                     >
                       <Icon size={18} />
@@ -167,10 +172,8 @@ export default function Navbar() {
             </ul>
           </div>
 
-          {/* RIGHT: Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Desktop Search */}
-            <InputGroup className="bg-background hidden md:flex h-9 border rounded-md">
+            <InputGroup className="bg-background hidden md:flex">
               <InputGroupAddon>
                 <IconSearch size={16} className="text-muted-foreground" />
               </InputGroupAddon>
@@ -180,7 +183,6 @@ export default function Navbar() {
               />
             </InputGroup>
 
-            {/* Mobile/Tablet Search Button */}
             <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
               <DialogTrigger
                 className={cn(
@@ -192,22 +194,25 @@ export default function Navbar() {
                 <span className="sr-only">Search</span>
               </DialogTrigger>
               <DialogContent className="top-4 translate-y-0 sm:top-[50%] sm:translate-y-[-50%]">
-                <DialogTitle className="sr-only">Search</DialogTitle>
-                <div className="flex items-center gap-2">
-                  <IconSearch
-                    size={20}
-                    className="text-muted-foreground shrink-0"
-                  />
-                  <Input
-                    placeholder={t.searchPlaceholder}
-                    className="border-0 focus-visible:ring-0 text-base"
-                    autoFocus
-                  />
-                </div>
+                <DialogHeader>
+                  <DialogTitle className="">Search</DialogTitle>
+                </DialogHeader>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <IconSearch
+                      size={20}
+                      className="text-muted-foreground shrink-0"
+                    />
+                    <InputGroupInput
+                      placeholder={t.searchPlaceholder}
+                      className="border-0 focus-visible:ring-0 text-base"
+                      autoFocus
+                    />
+                  </InputGroupAddon>
+                </InputGroup>
               </DialogContent>
             </Dialog>
 
-            {/* Desktop Language Selector */}
             <div className="hidden sm:block">
               <Select value={selectValue} onValueChange={handleLangChange}>
                 <SelectTrigger className="bg-background h-9 w-17.5 text-xs">
@@ -220,10 +225,8 @@ export default function Navbar() {
               </Select>
             </div>
 
-            {/* Theme Toggle */}
             <ModeToggle />
 
-            {/* Cart */}
             <Button size="icon" variant="outline" className="relative">
               <IconGardenCart size={20} />
               <Badge className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
@@ -232,19 +235,17 @@ export default function Navbar() {
               <span className="sr-only">Cart</span>
             </Button>
 
-            {/* User Menu - Desktop/Tablet */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="outline-none hidden sm:flex items-center justify-center rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                <Avatar className="transition-transform hover:scale-105 rounded-none">
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
-                    className={"rounded-none"}
-                  />
-                  <AvatarFallback className={"rounded-none"}>CN</AvatarFallback>
-                </Avatar>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size={"icon"}
+                  className="sm:flex hidden"
+                >
+                  <IconUser />
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
                 <div className="px-1.5 py-1">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">shadcn</p>
@@ -254,16 +255,14 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <IconUser className="mr-2 h-4 w-4" />
-                    {t.userMenu.account}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <IconSettings className="mr-2 h-4 w-4" />
-                    {t.userMenu.settings}
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem className="cursor-pointer">
+                  <IconUser className="mr-2 h-4 w-4" />
+                  {t.userMenu.account}
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  <IconSettings className="mr-2 h-4 w-4" />
+                  {t.userMenu.settings}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
@@ -275,7 +274,6 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Mobile Menu - Sheet */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger
                 className={cn(
@@ -304,10 +302,9 @@ export default function Navbar() {
                 </SheetHeader>
 
                 <div className="flex flex-col h-[calc(100vh-65px)]">
-                  {/* User Profile Section - Mobile Only */}
                   <button
                     type="button"
-                    className="p-4 border-b sm:hidden text-left hover:bg-accent/50 transition-colors"
+                    className="p-4 border-b sm:hidden text-left"
                     onClick={() => handleNavClick(`/${lang}/account`)}
                   >
                     <div className="flex items-center gap-3">
@@ -315,7 +312,7 @@ export default function Navbar() {
                         <AvatarImage
                           src="https://github.com/shadcn.png"
                           alt="@shadcn"
-                          className={"rounded-none"}
+                          className="rounded-none"
                         />
                         <AvatarFallback className="rounded-none">
                           CN
@@ -334,7 +331,6 @@ export default function Navbar() {
                     </div>
                   </button>
 
-                  {/* Navigation Links */}
                   <div className="flex-1 overflow-y-auto">
                     <nav className="p-2">
                       <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -349,10 +345,10 @@ export default function Navbar() {
                             type="button"
                             onClick={() => handleNavClick(link.href)}
                             className={cn(
-                              "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors text-left",
+                              "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-left",
                               isActive
                                 ? "bg-primary/10 text-primary"
-                                : "text-foreground hover:bg-accent",
+                                : "text-foreground",
                             )}
                           >
                             <Icon size={20} />
@@ -367,13 +363,11 @@ export default function Navbar() {
 
                     <Separator className="my-2" />
 
-                    {/* Settings Section */}
                     <div className="p-2">
                       <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Settings
                       </p>
 
-                      {/* Language Selector - Mobile */}
                       <div className="px-3 py-3 sm:hidden">
                         <p className="text-sm font-medium mb-2">Language</p>
                         <div className="flex gap-2">
@@ -403,7 +397,7 @@ export default function Navbar() {
                       <button
                         type="button"
                         onClick={() => handleNavClick(`/${lang}/account`)}
-                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent text-left"
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-left"
                       >
                         <IconUser size={20} />
                         {t.userMenu.account}
@@ -412,7 +406,7 @@ export default function Navbar() {
                       <button
                         type="button"
                         onClick={() => handleNavClick(`/${lang}/settings`)}
-                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-accent text-left"
+                        className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-left"
                       >
                         <IconSettings size={20} />
                         {t.userMenu.settings}
@@ -420,14 +414,12 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  {/* Logout Button - Bottom */}
                   <div className="p-4 border-t mt-auto">
                     <Button
                       variant="destructive"
                       className="w-full justify-start"
                       onClick={() => {
                         setIsSheetOpen(false);
-                        // Handle logout logic here
                       }}
                     >
                       <IconDoorExit className="mr-2 h-4 w-4" />

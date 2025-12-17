@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +9,9 @@ import {
   IconHeart,
   IconShoppingBag,
 } from "@tabler/icons-react";
+import Link from "next/link";
+import { slugify } from "@/lib/products";
+import { cn } from "@/lib/utils";
 
 export interface Product {
   id?: string;
@@ -24,6 +29,7 @@ export type ProductCardProps = {
   isFavorite?: boolean;
   onAddToCart?: (product: Product) => void;
   onToggleFavorite?: (product: Product) => void;
+  lang?: string;
 };
 
 export default function ProductCard({
@@ -33,21 +39,38 @@ export default function ProductCard({
   isFavorite = false,
   onAddToCart,
   onToggleFavorite,
+  lang,
 }: ProductCardProps) {
   const { title, description, price, sizes, images } = product;
   const [frontImage, backImage] = images;
 
-  return (
+  const CardContentWrapper = ({ children }: { children: React.ReactNode }) => (
     <Card
-      className={`group/card w-full max-w-xl border-0 shadow-none rounded-xl overflow-hidden pt-0 ${className ?? ""}`}
+      className={cn(
+        "group/card w-full max-w-xl border-0 shadow-none rounded-xl overflow-hidden pt-0 relative",
+        className
+      )}
     >
+      {children}
+      {lang && (
+        <Link
+          href={`/${lang}/shop/${slugify(title)}`}
+          className="absolute inset-0 z-0"
+          aria-label={title}
+        />
+      )}
+    </Card>
+  );
+
+  const content = (
+    <>
       <div className="relative overflow-hidden bg-secondary/20 aspect-square">
         <Image
           src={frontImage}
           alt={`A model wearing ${title}`}
           width={500}
           height={500}
-          className="object-cover w-full h-full transition-opacity duration-500 group-hover/card:opacity-0 ease-in-out"
+          className="object-cover w-full h-full transition-opacity duration-500 group-hover/card:opacity-0 ease-in-out relative z-0"
         />
         {backImage ? (
           <Image
@@ -55,15 +78,19 @@ export default function ProductCard({
             alt={`${title} product shoot`}
             width={500}
             height={500}
-            className="absolute inset-0 object-cover w-full h-full opacity-0 transition-opacity duration-500 ease-in-out group-hover/card:opacity-100"
+            className="absolute inset-0 object-cover w-full h-full opacity-0 transition-opacity duration-500 ease-in-out group-hover/card:opacity-100 z-0"
           />
         ) : null}
         <Button
           variant="ghost"
           size="icon"
           aria-pressed={isFavorite}
-          className={`absolute z-10 top-2 right-2 md:top-3 md:right-3 h-8 w-8 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:text-red-500 transition-colors ${isFavorite ? "text-red-500" : ""}`}
+          className={cn(
+            "absolute z-10 top-2 right-2 md:top-3 md:right-3 h-8 w-8 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:text-red-500 transition-colors",
+            isFavorite ? "text-red-500" : ""
+          )}
           onClick={(e) => {
+            // No need for preventDefault on Link if button is higher z-index, but good practice
             e.stopPropagation();
             onToggleFavorite?.(product);
           }}
@@ -72,10 +99,10 @@ export default function ProductCard({
         </Button>
       </div>
 
-      <CardContent className="p-3 md:p-4">
+      <CardContent className="p-3 md:p-4 pointer-events-none">
         <div className="flex justify-between items-start gap-3 mb-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-medium leading-tight truncate md:text-base text-foreground">
+            <h2 className="text-sm font-medium leading-tight truncate md:text-base text-foreground group-hover/card:underline underline-offset-4 decoration-1">
               {title}
             </h2>
             <p className="text-xs text-muted-foreground truncate mt-0.5 md:mt-1">
@@ -104,13 +131,18 @@ export default function ProductCard({
         </div>
 
         <Button
-          className="w-full rounded-lg gap-2 text-xs md:text-sm h-9 md:h-10"
-          onClick={() => onAddToCart?.(product)}
+          className="w-full rounded-lg gap-2 text-xs md:text-sm h-9 md:h-10 z-20 relative pointer-events-auto"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart?.(product);
+          }}
         >
           <IconShoppingBag className="w-4 h-4" />
           {addToCartText}
         </Button>
       </CardContent>
-    </Card>
+    </>
   );
+
+  return <CardContentWrapper>{content}</CardContentWrapper>;
 }

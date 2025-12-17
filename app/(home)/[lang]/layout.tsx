@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
-import LenisProvider from "@/components/lenis-provider";
+import Navbar from "@/components/navbar";
 
 type LayoutParams = { lang?: string };
 
@@ -19,5 +19,10 @@ export default async function LangLayout({
   }
 
   // Do NOT render <html>/<body> here since RootLayout already owns those tags.
-  return <LenisProvider>{children}</LenisProvider>;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 }
