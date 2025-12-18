@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   IconBook,
   IconDoorExit,
@@ -14,6 +14,8 @@ import {
   IconUser,
   IconX,
   IconChevronRight,
+  IconHistory,
+  IconRss,
 } from "@tabler/icons-react";
 import { ModeToggle } from "./mode-toggle";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
@@ -54,6 +56,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { dict } from "@/lib/dict";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import CartButton from "./cart-button";
 
 const LOCALE_TO_SELECT_VALUE = {
   en: "EN",
@@ -87,6 +90,20 @@ export default function Navbar() {
   const router = useRouter();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const currentLocale = pathname ? getLocaleFromPathname(pathname) : null;
   const lang = currentLocale ?? "en";
@@ -111,14 +128,14 @@ export default function Navbar() {
 
   const navLinks = [
     { href: `/${lang}`, label: t.links.home, icon: IconHome },
-    { href: `/${lang}/browse`, label: t.links.browse, icon: IconGlobe },
+    { href: `/${lang}/shop`, label: t.links.browse, icon: IconGlobe },
     {
-      href: `/${lang}/new-arrivals`,
+      href: `/${lang}/blogs`,
       label: t.links.newArrivals,
-      icon: IconPackageImport,
+      icon: IconRss,
     },
     {
-      href: `/${lang}/philosophy`,
+      href: `/${lang}/about`,
       label: t.links.philosophy,
       icon: IconBook,
     },
@@ -137,7 +154,14 @@ export default function Navbar() {
   };
 
   return (
-    <header className="w-full backdrop-blur-xl fixed top-0 bg-background/40 z-50 border-b border-border/50">
+    <header
+      className={cn(
+        "w-full fixed top-0 z-50 transition-all duration-300 ease-in-out",
+        isScrolled
+          ? "backdrop-blur-xl bg-background/40 border-b border-border/50"
+          : "bg-linear-to-b from-background/50 to-background-5 border-transparent"
+      )}
+    >
       <nav className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-4 lg:gap-6">
@@ -160,7 +184,7 @@ export default function Navbar() {
                       href={link.href}
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium",
-                        isActive ? "bg-primary/10 text-primary" : "font-thin",
+                        isActive ? "bg-primary/10 text-primary" : "font-thin"
                       )}
                     >
                       <Icon size={18} />
@@ -173,7 +197,7 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <InputGroup className="bg-background hidden md:flex">
+            <InputGroup className="hidden md:flex bg-background">
               <InputGroupAddon>
                 <IconSearch size={16} className="text-muted-foreground" />
               </InputGroupAddon>
@@ -187,7 +211,7 @@ export default function Navbar() {
               <DialogTrigger
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9 md:hidden",
+                  "h-9 w-9 md:hidden"
                 )}
               >
                 <IconSearch size={20} />
@@ -227,13 +251,7 @@ export default function Navbar() {
 
             <ModeToggle />
 
-            <Button size="icon" variant="outline" className="relative">
-              <IconGardenCart size={20} />
-              <Badge className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                0
-              </Badge>
-              <span className="sr-only">Cart</span>
-            </Button>
+            <CartButton />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -259,10 +277,12 @@ export default function Navbar() {
                   <IconUser className="mr-2 h-4 w-4" />
                   {t.userMenu.account}
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  <IconSettings className="mr-2 h-4 w-4" />
-                  {t.userMenu.settings}
-                </DropdownMenuItem>
+                <Link href={`/${lang}/settings`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <IconSettings className="mr-2 h-4 w-4" />
+                    {t.userMenu.settings}
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
@@ -278,7 +298,7 @@ export default function Navbar() {
               <SheetTrigger
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "h-9 w-9 lg:hidden",
+                  "h-9 w-9 lg:hidden"
                 )}
               >
                 <IconMenu2 size={20} />
@@ -287,18 +307,7 @@ export default function Navbar() {
 
               <SheetContent side="right" className="w-full sm:w-80 p-0">
                 <SheetHeader className="p-4 border-b">
-                  <div className="flex items-center justify-between">
-                    <SheetTitle className="text-left">{t.brand}</SheetTitle>
-                    <SheetClose
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "h-8 w-8",
-                      )}
-                    >
-                      <IconX size={18} />
-                      <span className="sr-only">Close</span>
-                    </SheetClose>
-                  </div>
+                  <SheetTitle className="text-left">{t.brand}</SheetTitle>
                 </SheetHeader>
 
                 <div className="flex flex-col h-[calc(100vh-65px)]">
@@ -348,7 +357,7 @@ export default function Navbar() {
                               "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-left",
                               isActive
                                 ? "bg-primary/10 text-primary"
-                                : "text-foreground",
+                                : "text-foreground"
                             )}
                           >
                             <Icon size={20} />
