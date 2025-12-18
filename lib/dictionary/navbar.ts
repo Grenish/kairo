@@ -4,7 +4,7 @@ export const navbar = {
     links: {
       home: "Home",
       browse: "Browse",
-      newArrivals: "New Arrivals",
+      newArrivals: "Blogs",
       philosophy: "Philosophy",
     },
     searchPlaceholder: "Search...",
@@ -23,7 +23,7 @@ export const navbar = {
     links: {
       home: "ホーム",
       browse: "ブラウズ",
-      newArrivals: "新着",
+      newArrivals: "ブログ",
       philosophy: "理念",
     },
     searchPlaceholder: "検索...",
