@@ -5,19 +5,14 @@ import ProductCard from "./product-card";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
+import { Product } from "./product-card";
+
 type TrendingSectionText = {
   title: string;
   subtitle: string;
   viewAll: string;
   addToCart: string;
-  items: readonly {
-    id: string;
-    images: readonly string[];
-    title: string;
-    description: string;
-    sizes: readonly string[];
-    price: number;
-  }[];
+  items: readonly Product[];
 };
 
 export default function TrendingSection({
@@ -30,7 +25,7 @@ export default function TrendingSection({
   return (
     <section className="w-full py-16 px-4 bg-secondary/5">
       <div className="max-w-8xl mx-auto flex flex-col gap-10">
-        <div className="flex flex-col items-center justify-center text-center space-y-2">
+        <div className="flex flex-col items-start justify-center text-center space-y-2">
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
             {t.title}
           </h2>
