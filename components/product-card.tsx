@@ -20,6 +20,7 @@ export interface Product {
   price: number;
   sizes: readonly string[];
   images: readonly [string, ...string[]];
+  slug?: string;
 }
 
 export type ProductCardProps = {
@@ -41,7 +42,7 @@ export default function ProductCard({
   onToggleFavorite,
   lang,
 }: ProductCardProps) {
-  const { title, description, price, sizes, images } = product;
+  const { title, description, price, sizes, images, slug } = product;
   const [frontImage, backImage] = images;
 
   const CardContentWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -54,7 +55,7 @@ export default function ProductCard({
       {children}
       {lang && (
         <Link
-          href={`/${lang}/shop/${slugify(title)}`}
+          href={`/${lang}/shop/${slug || slugify(title)}`}
           className="absolute inset-0 z-0"
           aria-label={title}
         />
