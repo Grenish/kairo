@@ -1,6 +1,7 @@
 import { Product } from "@/components/product-card";
 import { ShopInterface } from "@/components/shop/shop-interface";
 import { dict } from "@/lib/dict";
+import { getAllProducts } from "@/lib/products";
 import { notFound } from "next/navigation";
 
 export default async function ShopPage({
@@ -13,10 +14,8 @@ export default async function ShopPage({
 
   if (!t) return notFound();
 
-  // Combine products
-  const sampleProducts = t.productsSample.products as unknown as Product[];
-  const trendingProducts = t.trendingSection.items as unknown as Product[];
-  const allProducts = [...sampleProducts, ...trendingProducts];
+  // Combine products - Use getAllProducts to ensure slugs are consistent (Latin for JP)
+  const allProducts = getAllProducts(lang);
 
   const pageTitle = lang === "ja" ? "ショップ" : "Shop";
   const pageDescription =
@@ -38,6 +37,18 @@ export default async function ShopPage({
     priceRange: lang === "ja" ? "価格帯" : "Price Range",
     clearFilters: lang === "ja" ? "フィルターをクリア" : "Clear Filters",
     results: lang === "ja" ? "件の結果" : "results",
+    categories:
+      lang === "ja"
+        ? {
+            Suits: "スーツ",
+            Dresses: "ドレス",
+            Tops: "トップス",
+            Bottoms: "ボトムス",
+            Knitwear: "ニット",
+            Outerwear: "アウター",
+            Other: "その他",
+          }
+        : undefined,
   };
 
   return (
