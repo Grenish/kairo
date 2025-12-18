@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 type LayoutParams = { lang?: string };
 
@@ -23,6 +24,7 @@ export default async function LangLayout({
     <>
       <Navbar />
       {children}
+      <Footer lang={lang} />
     </>
   );
 }
