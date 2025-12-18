@@ -9,11 +9,17 @@ type ProductSampleText = {
   products: readonly Product[];
 };
 
-export default function ProductSample({ t }: { t: ProductSampleText }) {
+export default function ProductSample({
+  t,
+  lang,
+}: {
+  t: ProductSampleText;
+  lang?: string;
+}) {
   return (
     <section className="w-full py-10">
       <div className="mx-auto w-full max-w-8xl px-4">
-        <div className="mb-10 flex flex-col items-center justify-center text-center">
+        <div className="mb-10 flex flex-col items-start justify-center text-start">
           <h2 className="text-3xl font-semibold md:text-4xl">{t.title}</h2>
           <p className="mt-2 max-w-2xl text-lg font-thin text-gray-600 dark:text-gray-300">
             {t.description}
@@ -29,6 +35,7 @@ export default function ProductSample({ t }: { t: ProductSampleText }) {
               onToggleFavorite={() =>
                 console.log("Toggle favorite", product.id)
               }
+              lang={lang}
             />
           ))}
         </div>
