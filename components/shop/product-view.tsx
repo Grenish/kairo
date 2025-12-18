@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -18,12 +19,15 @@ import {
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { SizeGuide } from "./size-guide";
+import { slugify } from "@/lib/products";
 
 interface ProductViewProps {
   product: Product;
   rating: number;
   reviewCount: number;
 }
+
+import { dict } from "@/lib/dict";
 
 export function ProductView({
   product,
@@ -34,6 +38,11 @@ export function ProductView({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+
+  const params = useParams();
+  const router = useRouter();
+  const lang = (params.lang as "en" | "ja") || "en";
+  const t = dict[lang].product;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pb-20 items-start">
@@ -90,13 +99,13 @@ export function ProductView({
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm">
             <Badge className="rounded-full px-3 py-1 font-medium bg-primary/10 text-primary hover:bg-primary/20 border-none">
-              New Arrival
+              {t.newArrival}
             </Badge>
             <Badge
               variant="outline"
               className="rounded-full px-3 py-1 font-medium bg-background"
             >
-              In Stock
+              {t.inStock}
             </Badge>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
@@ -115,7 +124,7 @@ export function ProductView({
             </div>
             <Separator orientation="vertical" className="h-4" />
             <span className="underline cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-              {reviewCount} reviews
+              {reviewCount} {t.reviews}
             </span>
           </div>
         </div>
@@ -126,40 +135,39 @@ export function ProductView({
               ¥{product.price.toLocaleString()}
             </span>
             <span className="text-muted-foreground text-sm mb-1.5">
-              Tax included
+              {t.taxIncluded}
             </span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Free shipping on orders over ¥50,000
-          </p>
+          <p className="text-sm text-muted-foreground">{t.freeShipping}</p>
         </div>
 
         <Separator />
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Select Size</span>
+            <span className="text-sm font-medium">{t.selectSize}</span>
             <SizeGuide />
           </div>
           <div className="grid grid-cols-4 gap-3">
             {product.sizes.map((size) => (
-              <button
+              <Button
                 key={size}
+                variant="default"
                 onClick={() => setSelectedSize(size)}
                 className={cn(
-                  "h-12 rounded-lg border-2 text-sm font-medium transition-all flex items-center justify-center hover:border-primary/50",
+                  "h-12",
                   selectedSize === size
                     ? "border-primary bg-primary/5 text-primary"
                     : "border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
                 {size}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
-        <div className="space-y-4 pt-4">
+        <div className="space-y-4">
           <div className="flex gap-4">
             <div className="w-32 shrink-0">
               <div className="relative flex items-center w-full border-2 rounded-xl h-14 bg-background">
@@ -186,35 +194,43 @@ export function ProductView({
               className="flex-1 h-14 text-base rounded-xl gap-2 font-semibold shadow-lg shadow-primary/20"
             >
               <IconShoppingBag className="w-5 h-5" />
-              Add to Cart
+              {t.addToCart}
             </Button>
           </div>
           <Button
             size="lg"
             variant="outline"
             className="w-full h-12 rounded-xl border-2 hover:bg-secondary/50"
+            onClick={() => {
+              const slug = product.slug || slugify(product.title);
+              router.push(`/${lang}/checkout/${slug}`);
+            }}
           >
-            Buy Now
+            {t.buyNow}
           </Button>
         </div>
 
         <div className="prose prose-sm text-muted-foreground pt-6 border-t">
-          <h3 className="text-foreground font-semibold mb-2">Description</h3>
+          <h3 className="text-foreground font-semibold mb-2">
+            {t.description}
+          </h3>
           <p className="leading-relaxed">{product.description}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 pt-4">
           <div className="p-4 rounded-xl bg-secondary/10 border border-border/50 space-y-1">
             <IconCheck className="w-5 h-5 text-green-500 mb-2" />
-            <h4 className="font-medium text-sm">Authentic Design</h4>
+            <h4 className="font-medium text-sm">{t.authenticDesign}</h4>
             <p className="text-xs text-muted-foreground">
-              Original details by Miyu Kuroda
+              {t.authenticDesignDesc}
             </p>
           </div>
           <div className="p-4 rounded-xl bg-secondary/10 border border-border/50 space-y-1">
             <IconCheck className="w-5 h-5 text-green-500 mb-2" />
-            <h4 className="font-medium text-sm">Premium Material</h4>
-            <p className="text-xs text-muted-foreground">Sourced from Japan</p>
+            <h4 className="font-medium text-sm">{t.premiumMaterial}</h4>
+            <p className="text-xs text-muted-foreground">
+              {t.premiumMaterialDesc}
+            </p>
           </div>
         </div>
       </div>
