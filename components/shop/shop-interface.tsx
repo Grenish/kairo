@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ProductCard, { Product } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { IconFilter, IconSortDescending } from "@tabler/icons-react";
+import { IconFilter } from "@tabler/icons-react";
 
 interface ShopInterfaceProps {
   products: Product[];
@@ -38,39 +39,50 @@ interface ShopInterfaceProps {
     priceRange: string;
     clearFilters: string;
     results: string;
+    categories?: Record<string, string>;
   };
   lang: string;
 }
 
-export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
+function ShopContent({ products, t, lang }: ShopInterfaceProps) {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+
   const [sort, setSort] = useState("newest");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState([0, 200000]);
 
-  // Derive categories from product titles for now (since we don't have explicit category field)
-  // Heuristic: Check if title contains keywords
+  // Sync category from URL to state
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategories([categoryParam]);
+    }
+  }, [categoryParam]);
+
+  // Derive categories from product slugs
   const categories = useMemo(() => {
     const cats = new Set<string>();
     products.forEach((p) => {
-      if (p.title.toLowerCase().includes("suit")) cats.add("Suits");
-      else if (p.title.toLowerCase().includes("dress")) cats.add("Dresses");
-      else if (p.title.toLowerCase().includes("shirt")) cats.add("Tops");
-      else if (p.title.toLowerCase().includes("pant")) cats.add("Bottoms");
-      else if (p.title.toLowerCase().includes("knit")) cats.add("Knitwear");
-      else if (p.title.toLowerCase().includes("kimono")) cats.add("Outerwear");
+      const source = p.slug || p.title;
+      if (source.toLowerCase().includes("suit")) cats.add("Suits");
+      else if (source.toLowerCase().includes("dress")) cats.add("Dresses");
+      else if (source.toLowerCase().includes("shirt")) cats.add("Tops");
+      else if (source.toLowerCase().includes("pant")) cats.add("Bottoms");
+      else if (source.toLowerCase().includes("knit")) cats.add("Knitwear");
+      else if (source.toLowerCase().includes("kimono")) cats.add("Outerwear");
       else cats.add("Other");
     });
     return Array.from(cats).sort();
   }, [products]);
 
-  const getCategory = (title: string) => {
-    const t = title.toLowerCase();
-    if (t.includes("suit")) return "Suits";
-    if (t.includes("dress")) return "Dresses";
-    if (t.includes("shirt")) return "Tops";
-    if (t.includes("pant")) return "Bottoms";
-    if (t.includes("knit")) return "Knitwear";
-    if (t.includes("kimono")) return "Outerwear";
+  const getCategory = (product: Product) => {
+    const source = (product.slug || product.title).toLowerCase();
+    if (source.includes("suit")) return "Suits";
+    if (source.includes("dress")) return "Dresses";
+    if (source.includes("shirt")) return "Tops";
+    if (source.includes("pant")) return "Bottoms";
+    if (source.includes("knit")) return "Knitwear";
+    if (source.includes("kimono")) return "Outerwear";
     return "Other";
   };
 
@@ -79,7 +91,7 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
       .filter((p) => {
         const matchesCategory =
           selectedCategories.length === 0 ||
-          selectedCategories.includes(getCategory(p.title));
+          selectedCategories.includes(getCategory(p));
         const matchesPrice =
           p.price >= priceRange[0] && p.price <= priceRange[1];
         return matchesCategory && matchesPrice;
@@ -87,7 +99,7 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
       .sort((a, b) => {
         if (sort === "price-asc") return a.price - b.price;
         if (sort === "price-desc") return b.price - a.price;
-        return 0; // Default to original order (newest/featured)
+        return 0; // Default to original order
       });
   }, [products, sort, selectedCategories, priceRange]);
 
@@ -115,7 +127,7 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
                   htmlFor={`cat-${cat}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  {cat}
+                  {t.categories?.[cat] || cat}
                 </label>
               </div>
             ))}
@@ -157,15 +169,17 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Sheet>
-              <SheetTrigger>
-                <Button
-                  variant="outline"
-                  className="lg:hidden flex-1 sm:flex-none"
-                >
-                  <IconFilter className="w-4 h-4 mr-2" />
-                  {t.filters}
-                </Button>
-              </SheetTrigger>
+              <SheetTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    className="lg:hidden flex-1 sm:flex-none"
+                  >
+                    <IconFilter className="w-4 h-4 mr-2" />
+                    {t.filters}
+                  </Button>
+                }
+              />
               <SheetContent side="left">
                 <SheetHeader>
                   <SheetTitle>{t.filters}</SheetTitle>
@@ -186,7 +200,7 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
                             htmlFor={`mobile-cat-${cat}`}
                             className="text-sm font-medium leading-none cursor-pointer"
                           >
-                            {cat}
+                            {t.categories?.[cat] || cat}
                           </label>
                         </div>
                       ))}
@@ -258,5 +272,17 @@ export function ShopInterface({ products, t, lang }: ShopInterfaceProps) {
         )}
       </div>
     </div>
+  );
+}
+
+export function ShopInterface(props: ShopInterfaceProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen animate-pulse bg-accent/5 rounded-lg" />
+      }
+    >
+      <ShopContent {...props} />
+    </Suspense>
   );
 }
