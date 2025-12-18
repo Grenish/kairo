@@ -8,6 +8,7 @@ import TrendingSection from "@/components/trending-section";
 import BlogSection from "@/components/blog-section";
 import { dict } from "@/lib/dict";
 import { notFound } from "next/navigation";
+import { getSampleProducts, getTrendingProducts } from "@/lib/products";
 
 type PageParams = { lang?: string };
 
@@ -21,15 +22,24 @@ export default async function Page({
 
   if (lang !== "en" && lang !== "ja") notFound();
 
+  const sampleProducts = getSampleProducts(lang);
+  const trendingProducts = getTrendingProducts(lang);
+
   return (
     <>
       <Hero t={dict[lang].hero} />
       <CategorySection t={dict[lang].categorySection} lang={lang} />
       <Philosophy t={dict[lang].philosophySection} />
-      <ProductSample t={dict[lang].productsSample} />
+      <ProductSample
+        t={{ ...dict[lang].productsSample, products: sampleProducts }}
+        lang={lang}
+      />
       <Testimonials t={dict[lang].testimonialsSection} />
       <SneakPeak t={dict[lang].sneakPeakSection} />
-      <TrendingSection t={dict[lang].trendingSection} lang={lang} />
+      <TrendingSection
+        t={{ ...dict[lang].trendingSection, items: trendingProducts }}
+        lang={lang}
+      />
       <BlogSection t={dict[lang].blogSection} lang={lang} />
     </>
   );
