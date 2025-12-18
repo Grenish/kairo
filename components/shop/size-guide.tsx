@@ -9,35 +9,40 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
+import { dict } from "@/lib/dict";
 
 export function SizeGuide() {
+  const params = useParams();
+  const lang = (params.lang as "en" | "ja") || "en";
+  const t = dict[lang].product;
+
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button
-          variant={"link"}
-          className="text-sm text-muted-foreground underline underline-offset-4 hover:text-primary transition-colors"
-        >
-          Size Guide
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button
+            variant={"link"}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-primary transition-colors"
+          >
+            {t.sizeGuide}
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Japanese Size Chart</DialogTitle>
-          <DialogDescription>
-            General sizing conversions for our collection. All measurements are
-            in centimeters.
-          </DialogDescription>
+          <DialogTitle>{t.sizeChartTitle}</DialogTitle>
+          <DialogDescription>{t.sizeChartDesc}</DialogDescription>
         </DialogHeader>
         <div className="overflow-x-auto mt-4">
           <table className="w-full text-sm text-left">
             <thead className="bg-secondary/20 text-foreground font-semibold">
               <tr>
-                <th className="px-4 py-3 rounded-tl-lg">Size (JP)</th>
-                <th className="px-4 py-3">International</th>
-                <th className="px-4 py-3">Chest (cm)</th>
-                <th className="px-4 py-3">Waist (cm)</th>
-                <th className="px-4 py-3 rounded-tr-lg">Height (cm)</th>
+                <th className="px-4 py-3 rounded-tl-lg">{t.sizeJP}</th>
+                <th className="px-4 py-3">{t.sizeIntl}</th>
+                <th className="px-4 py-3">{t.chest}</th>
+                <th className="px-4 py-3">{t.waist}</th>
+                <th className="px-4 py-3 rounded-tr-lg">{t.height}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -78,10 +83,7 @@ export function SizeGuide() {
               </tr>
             </tbody>
           </table>
-          <p className="text-xs text-muted-foreground mt-4">
-            * These are general measurements. Fit may vary by style and
-            material.
-          </p>
+          <p className="text-xs text-muted-foreground mt-4">{t.sizeNote}</p>
         </div>
       </DialogContent>
     </Dialog>
