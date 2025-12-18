@@ -51,7 +51,7 @@ export default async function BlogPostPage({ params }: Props) {
           className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground hover:underline underline-offset-4 mb-8 transition-colors"
         >
           <IconArrowLeft className="mr-2 h-4 w-4" />
-          {lang === "en" ? "Back to Home" : "ホームに戻る"}
+          {lang === "en" ? "Go Back" : "戻る"}
         </Link>
         <div className="prose prose-stone dark:prose-invert prose-lg max-w-none">
           {post.content.map((paragraph, index) => (
