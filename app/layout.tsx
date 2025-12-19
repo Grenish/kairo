@@ -3,6 +3,7 @@ import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/components/providers/cart-provider";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
@@ -25,7 +26,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CartProvider>{children}</CartProvider>
+          <SmoothScrollProvider>
+            <CartProvider>{children}</CartProvider>
+          </SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>
