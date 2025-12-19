@@ -6,7 +6,7 @@ export const trendingSection = {
     addToCart: "Add to Cart",
     items: [
       {
-        id: "1",
+        id: "trending-1",
         images: [
           "/trending/kuro-silence-wrap-dress-2.png",
           "/trending/kuro-silence-wrap-dress-1.png",
@@ -18,7 +18,7 @@ export const trendingSection = {
         price: 38000,
       },
       {
-        id: "2",
+        id: "trending-2",
         images: [
           "/trending/hikari-flow-dress-2.png",
           "/trending/hikari-flow-dress-1.png",
@@ -30,7 +30,7 @@ export const trendingSection = {
         price: 29800,
       },
       {
-        id: "3",
+        id: "trending-3",
         images: [
           "/trending/akane-heritage-kimono-2.png",
           "/trending/akane-heritage-kimono-1.png",
@@ -42,7 +42,7 @@ export const trendingSection = {
         price: 120000,
       },
       {
-        id: "4",
+        id: "trending-4",
         images: [
           "/trending/enso-tailored-pants-2.png",
           "/trending/enso-tailored-pants-1.png",
@@ -62,7 +62,7 @@ export const trendingSection = {
     addToCart: "カートに追加",
     items: [
       {
-        id: "1",
+        id: "trending-1",
         images: [
           "/trending/kuro-silence-wrap-dress-2.png",
           "/trending/kuro-silence-wrap-dress-1.png",
@@ -74,7 +74,7 @@ export const trendingSection = {
         price: 38000,
       },
       {
-        id: "2",
+        id: "trending-2",
         images: [
           "/trending/hikari-flow-dress-2.png",
           "/trending/hikari-flow-dress-1.png",
@@ -86,7 +86,7 @@ export const trendingSection = {
         price: 29800,
       },
       {
-        id: "3",
+        id: "trending-3",
         images: [
           "/trending/akane-heritage-kimono-2.png",
           "/trending/akane-heritage-kimono-1.png",
@@ -98,7 +98,7 @@ export const trendingSection = {
         price: 120000,
       },
       {
-        id: "4",
+        id: "trending-4",
         images: [
           "/trending/enso-tailored-pants-2.png",
           "/trending/enso-tailored-pants-1.png",
