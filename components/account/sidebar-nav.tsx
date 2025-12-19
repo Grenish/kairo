@@ -8,6 +8,7 @@ import {
   IconStar,
   IconBookmark,
   IconChevronRight,
+  IconMapPin,
 } from "@tabler/icons-react";
 import { dict } from "@/lib/dict";
 
@@ -29,6 +30,7 @@ export default function SidebarNav({
     { id: "wishlist", label: t.wishlist, icon: IconHeart },
     { id: "reviews", label: t.reviews, icon: IconStar },
     { id: "saved", label: t.saved, icon: IconBookmark },
+    { id: "address", label: t.address, icon: IconMapPin },
   ];
 
   return (
