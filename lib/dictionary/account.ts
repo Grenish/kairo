@@ -13,6 +13,7 @@ export const account = {
       wishlist: "Wishlist",
       reviews: "Reviews",
       saved: "Saved for Later",
+      address: "Saved Address",
     },
     empty: {
       orders: "No past orders found.",
@@ -40,6 +41,7 @@ export const account = {
       wishlist: "ウィッシュリスト",
       reviews: "レビュー",
       saved: "あとで買う",
+      address: "保存された住所",
     },
     empty: {
       orders: "購入履歴がありません。",
