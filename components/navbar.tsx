@@ -273,10 +273,12 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
-                  <IconUser className="mr-2 h-4 w-4" />
-                  {t.userMenu.account}
-                </DropdownMenuItem>
+                <Link href={`/${lang}/account`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <IconUser className="mr-2 h-4 w-4" />
+                    {t.userMenu.account}
+                  </DropdownMenuItem>
+                </Link>
                 <Link href={`/${lang}/settings`}>
                   <DropdownMenuItem className="cursor-pointer">
                     <IconSettings className="mr-2 h-4 w-4" />
