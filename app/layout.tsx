@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CartProvider } from "@/components/providers/cart-provider";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <CartProvider>{children}</CartProvider>
         </ThemeProvider>
       </body>
     </html>
