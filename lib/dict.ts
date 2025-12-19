@@ -13,6 +13,8 @@ import { checkout } from "./dictionary/checkout";
 import { about } from "./dictionary/about";
 import { footer } from "./dictionary/footer";
 import { settings } from "./dictionary/settings";
+import { cart } from "./dictionary/cart";
+import { account } from "./dictionary/account";
 
 export const dict = {
   en: {
@@ -31,6 +33,8 @@ export const dict = {
     about: about.en,
     footer: footer.en,
     settings: settings.en,
+    cart: cart.en,
+    account: account.en,
   },
   ja: {
     navbar: navbar.ja,
@@ -48,5 +52,7 @@ export const dict = {
     about: about.ja,
     footer: footer.ja,
     settings: settings.ja,
+    cart: cart.ja,
+    account: account.ja,
   },
 } as const;
