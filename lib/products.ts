@@ -34,6 +34,10 @@ export function getTrendingProducts(
   const items = t.trendingSection.items as unknown as Product[];
   const itemsEn = en.trendingSection.items as unknown as Product[];
 
+  console.log(
+    `[getTrendingProducts] lang: ${lang}, items[0].title: ${items[0]?.title}`
+  );
+
   return items.map((p, i) => ({
     ...p,
     slug: slugify(itemsEn[i]?.title || p.title),
@@ -62,4 +66,9 @@ export function getProductBySlug(slug: string, lang: "en" | "ja") {
     );
   }
   return match;
+}
+
+export function getProductById(id: string, lang: "en" | "ja") {
+  const products = getAllProducts(lang);
+  return products.find((p) => p.id === id);
 }
