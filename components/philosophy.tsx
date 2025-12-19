@@ -16,7 +16,7 @@ export default function Philosophy({ t }: { t: PhilosophyText }) {
           <h2 className="text-4xl font-semibold capitalize tracking-tight sm:text-5xl md:text-6xl text-center transition-colors duration-300 drop-shadow-sm">
             {t.title}
           </h2>
-          <p className="text-lg w-1/4 text-center font-thin leading-tight mt-2">
+          <p className="text-lg w-1/2 md:w-1/5 text-center font-thin leading-tight mt-2">
             {t.description}
           </p>
           <Button
