@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 type LoginFormProps = React.ComponentProps<"div"> & {
+  lang: string;
   t: {
     welcome: string;
     description: string;
@@ -36,7 +37,7 @@ type LoginFormProps = React.ComponentProps<"div"> & {
   };
 };
 
-export function LoginForm({ className, t, ...props }: LoginFormProps) {
+export function LoginForm({ className, t, lang, ...props }: LoginFormProps) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -90,7 +91,7 @@ export function LoginForm({ className, t, ...props }: LoginFormProps) {
               <Field>
                 <Button type="submit">{t.submit}</Button>
                 <FieldDescription className="text-center">
-                  {t.noAccount} <a href="#">{t.signUp}</a>
+                  {t.noAccount} <a href={`/${lang}/signup`}>{t.signUp}</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
