@@ -9,12 +9,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
 import { dict } from "@/lib/dict";
 
-export function SizeGuide() {
-  const params = useParams();
-  const lang = (params.lang as "en" | "ja") || "en";
+interface SizeGuideProps {
+  lang: "en" | "ja";
+}
+
+export function SizeGuide({ lang }: SizeGuideProps) {
   const t = dict[lang].product;
 
   return (
