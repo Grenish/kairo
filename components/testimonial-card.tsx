@@ -24,7 +24,7 @@ export default function TestimonialCard({
     <Card
       className={cn(
         "group relative overflow-hidden rounded-2xl border border-border bg-card p-8 transition-all duration-300 hover:shadow-md hover:border-primary/20",
-        className,
+        className
       )}
     >
       <div className="absolute -top-6 -right-6 z-0 text-muted opacity-50 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
@@ -33,11 +33,6 @@ export default function TestimonialCard({
 
       <div className="relative z-10 flex h-full flex-col justify-between gap-6">
         <div className="space-y-4">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary/50 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-secondary-foreground backdrop-blur-sm">
-            <IconLanguageHiragana size={12} stroke={1.5} />
-            <span>Translated from Japanese</span>
-          </div>
-
           <blockquote className="text-base font-medium leading-relaxed text-card-foreground/90 tracking-tight">
             {testimonials}
           </blockquote>
