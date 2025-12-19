@@ -15,7 +15,9 @@ import {
   IconPlus,
   IconShare,
   IconShoppingBag,
+  IconCreditCard,
   IconStarFilled,
+  IconStar,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { SizeGuide } from "./size-guide";
@@ -23,16 +25,17 @@ import { slugify } from "@/lib/products";
 
 interface ProductViewProps {
   product: Product;
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
 }
 
 import { dict } from "@/lib/dict";
+import { useCartActions } from "@/components/providers/cart-provider";
 
 export function ProductView({
   product,
-  rating,
-  reviewCount,
+  rating = 4.8,
+  reviewCount = 124,
 }: ProductViewProps) {
   const [selectedImage, setSelectedImage] = useState(product.images[0]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -43,6 +46,7 @@ export function ProductView({
   const router = useRouter();
   const lang = (params.lang as "en" | "ja") || "en";
   const t = dict[lang].product;
+  const { addToCart } = useCartActions();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pb-20 items-start">
@@ -146,7 +150,7 @@ export function ProductView({
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">{t.selectSize}</span>
-            <SizeGuide />
+            <SizeGuide lang={lang} />
           </div>
           <div className="grid grid-cols-4 gap-3">
             {product.sizes.map((size) => (
@@ -192,6 +196,17 @@ export function ProductView({
             <Button
               size="lg"
               className="flex-1 h-14 text-base rounded-xl gap-2 font-semibold shadow-lg shadow-primary/20"
+              onClick={() => {
+                const cartT = dict[lang].cart;
+                if (!selectedSize) {
+                  // toast.error(cartT.selectSizeError);
+                  return;
+                }
+                addToCart(product, quantity, selectedSize);
+                // toast.success(cartT.addedToCart);
+                setQuantity(1);
+                setSelectedSize(null);
+              }}
             >
               <IconShoppingBag className="w-5 h-5" />
               {t.addToCart}
@@ -206,6 +221,7 @@ export function ProductView({
               router.push(`/${lang}/checkout/${slug}`);
             }}
           >
+            <IconCreditCard className="w-5 h-5 mr-2" />
             {t.buyNow}
           </Button>
         </div>
