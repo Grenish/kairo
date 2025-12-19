@@ -5,12 +5,15 @@ import { Button } from "./ui/button";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
 
 interface CartItemCardProps {
+  id?: string;
   image: string;
   description: string;
   name: string;
   size: string;
   price: number;
   quantity: number;
+  onUpdateQuantity?: (quantity: number) => void;
+  onRemove?: () => void;
 }
 
 export default function CartItemCard({
@@ -20,6 +23,8 @@ export default function CartItemCard({
   size,
   price,
   quantity,
+  onUpdateQuantity,
+  onRemove,
 }: CartItemCardProps) {
   return (
     <Card className="overflow-hidden">
@@ -40,7 +45,7 @@ export default function CartItemCard({
                 {name}
               </h3>
               <p className="line-clamp-1 text-xs text-muted-foreground">
-                {description.slice(0, 50)}
+                {description}
               </p>
             </div>
           </div>
@@ -71,6 +76,13 @@ export default function CartItemCard({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 rounded-none rounded-l-md"
+                onClick={() => {
+                  if (quantity > 1) {
+                    onUpdateQuantity?.(quantity - 1);
+                  } else {
+                    onRemove?.();
+                  }
+                }}
               >
                 <IconMinus size={12} />
               </Button>
@@ -81,6 +93,7 @@ export default function CartItemCard({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 rounded-none rounded-r-md"
+                onClick={() => onUpdateQuantity?.(quantity + 1)}
               >
                 <IconPlus size={12} />
               </Button>
