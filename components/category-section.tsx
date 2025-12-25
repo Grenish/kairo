@@ -42,14 +42,14 @@ export default function CategorySection({
                 className="object-cover w-full transition-transform duration-500 ease-in-out group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out flex flex-col items-center justify-center">
-                <h2 className="text-white font-medium text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300 ease-in-out flex flex-col items-center justify-center">
+                <h2 className="text-white font-medium text-xl translate-y-0 lg:translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-300 delay-75">
                   {headline}
                 </h2>
 
                 <Link
                   href={`/${lang}${href}`}
-                  className="mt-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 delay-100"
+                  className="mt-3 opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-300 delay-100"
                 >
                   <Button variant="secondary" size="sm" className="w-24">
                     {t.cta}
