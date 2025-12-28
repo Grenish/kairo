@@ -29,7 +29,7 @@ export default async function Page({
     <>
       <Hero t={dict[lang].hero} />
       <CategorySection t={dict[lang].categorySection} lang={lang} />
-      <Philosophy t={dict[lang].philosophySection} />
+      <Philosophy t={dict[lang].philosophySection} lang={lang} />
       <ProductSample
         t={{ ...dict[lang].productsSample, products: sampleProducts }}
         lang={lang}
