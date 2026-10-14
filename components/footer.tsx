@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { IconBrandLinkedin } from "@tabler/icons-react";
 import { dict } from "@/lib/dict";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -45,7 +46,7 @@ export default function Footer({ lang }: { lang: "en" | "ja" }) {
                             ? link.href
                             : `/${lang}${link.href}`
                         }
-                        className="text-sm font-light hover:text-foreground transition-colors duration-300 ease-out"
+                        className="text-sm font-light underline-offset-4 hover:text-foreground hover:underline transition-colors duration-300 ease-out"
                       >
                         {link.label}
                       </Link>
@@ -86,14 +87,28 @@ export default function Footer({ lang }: { lang: "en" | "ja" }) {
           </div>
         </div>
 
-        <Separator className="my-16 bg-border/40" />
+        <Separator className="my-12 md:my-16 bg-border/40" />
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="order-2 md:order-1">
+          <div className="order-2 md:order-1 flex flex-col items-center md:items-start gap-2">
             <p className="text-[10px] tracking-widest text-muted-foreground/60 uppercase font-mono">
               {t.brand.copyright}
             </p>
+            <div className="flex items-center gap-2">
+              <p className="text-[10px] tracking-widest text-muted-foreground/50 uppercase font-mono">
+                Created by Gagan Sarmah
+              </p>
+              <a
+                href="https://www.linkedin.com/in/gagansarmah20031/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Gagan Sarmah on LinkedIn"
+                className="text-muted-foreground/50 hover:text-foreground/80 transition-colors"
+              >
+                <IconBrandLinkedin size={14} stroke={1.5} />
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-8 order-1 md:order-2">
