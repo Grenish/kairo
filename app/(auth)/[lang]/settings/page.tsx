@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { useTheme } from "next-themes";
 import { useParams } from "next/navigation";
 import { dict } from "@/lib/dict";
 import { Button } from "@/components/ui/button";
@@ -20,13 +21,9 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const THEME_KEY = "theme";
 type Theme = "light" | "dark";
 
-function applyTheme(theme: Theme) {
-  if (typeof window === "undefined") return;
-  document.documentElement.classList.toggle("dark", theme === "dark");
-}
+const subscribe = () => () => {};
 
 export default function SettingsPage() {
   const params = useParams();
@@ -46,8 +43,14 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   // Theme state
-  const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+  // next-themes owns persistence, the `dark` class, and transition suppression.
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const theme: Theme = mounted && resolvedTheme === "dark" ? "dark" : "light";
 
   // Notification state
   const [notifications, setNotifications] = useState({
@@ -60,22 +63,8 @@ export default function SettingsPage() {
     "email" | "phone" | "both"
   >("email");
 
-  // Initialize theme from localStorage
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(THEME_KEY) as Theme | null;
-      if (stored && (stored === "light" || stored === "dark")) {
-        setTheme(stored);
-        applyTheme(stored);
-      }
-    }
-  }, []);
-
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
-    localStorage.setItem(THEME_KEY, newTheme);
-    applyTheme(newTheme);
   };
 
   const toggleNotification = (key: keyof typeof notifications) => {
@@ -358,6 +347,8 @@ export default function SettingsPage() {
                           return (
                             <button
                               key={mode}
+                              type="button"
+                              aria-pressed={theme === mode}
                               onClick={() => handleThemeChange(mode)}
                               className={cn(
                                 "flex flex-col items-center justify-center gap-3 p-6 border rounded-lg transition-all",
