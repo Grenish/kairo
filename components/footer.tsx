@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { IconBrandLinkedin } from "@tabler/icons-react";
 import { dict } from "@/lib/dict";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -94,9 +95,20 @@ export default function Footer({ lang }: { lang: "en" | "ja" }) {
             <p className="text-[10px] tracking-widest text-muted-foreground/60 uppercase font-mono">
               {t.brand.copyright}
             </p>
-            <p className="text-[10px] tracking-widest text-muted-foreground/50 uppercase font-mono">
-              Created by Gagan Sarmah
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-[10px] tracking-widest text-muted-foreground/50 uppercase font-mono">
+                Created by Gagan Sarmah
+              </p>
+              <a
+                href="https://www.linkedin.com/in/gagansarmah20031/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Gagan Sarmah on LinkedIn"
+                className="text-muted-foreground/50 hover:text-foreground/80 transition-colors"
+              >
+                <IconBrandLinkedin size={14} stroke={1.5} />
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-8 order-1 md:order-2">
