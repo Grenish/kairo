@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { SignupForm } from "@/components/auth/signup-form";
 import { dict } from "@/lib/dict";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Create Account",
+  description:
+    "Create a Kairo account to save favorites, track orders, receive early access to new collections, and enjoy exclusive offers.",
+};
 
 export default async function SignupPage({
   params,

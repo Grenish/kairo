@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 import { dict } from "@/lib/dict";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Log In",
+  description:
+    "Log in to your Kairo account to manage orders, track shipping, save favorites, and check out faster.",
+};
 
 export default async function LoginPage({
   params,

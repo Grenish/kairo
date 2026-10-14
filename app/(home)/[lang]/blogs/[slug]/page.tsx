@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { dict } from "@/lib/dict";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -11,6 +12,24 @@ type Props = {
     slug: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const post = dict[lang]?.blogSection.posts.find((p) => p.slug === slug);
+  if (!post) return { title: "Article Not Found" };
+  const description =
+    post.excerpt.charAt(0).toUpperCase() + post.excerpt.slice(1);
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      images: [post.image],
+    },
+  };
+}
 
 export default async function BlogPostPage({ params }: Props) {
   const { lang, slug } = await params;

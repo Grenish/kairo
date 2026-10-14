@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import CategorySection from "@/components/category-section";
 import Hero from "@/components/hero";
 import Philosophy from "@/components/philosophy";
@@ -11,6 +12,12 @@ import { notFound } from "next/navigation";
 import { getSampleProducts, getTrendingProducts } from "@/lib/products";
 
 type PageParams = { lang?: string };
+
+export const metadata: Metadata = {
+  title: { absolute: "Kairo | Japanese Fashion and Quiet Luxury" },
+  description:
+    "Discover Kairo, a curated destination for Japanese fashion. Shop timeless, craft-driven pieces rooted in wabi-sabi and quiet luxury.",
+};
 
 export default async function Page({
   params,

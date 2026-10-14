@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getProductBySlug } from "@/lib/products";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -9,6 +10,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CheckoutForm from "./checkout-form";
 import { dict } from "@/lib/dict";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "ja"; product: string }>;
+}): Promise<Metadata> {
+  const { lang, product: slug } = await params;
+  const product = getProductBySlug(slug, lang);
+  return {
+    title: product ? `Checkout: ${product.title}` : "Checkout",
+    description:
+      "Complete your Kairo order securely. Review your item, apply bank offers, and enter shipping and payment details to check out.",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function CheckoutPage({
   params,
