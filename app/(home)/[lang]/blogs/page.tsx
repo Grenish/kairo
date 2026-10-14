@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { dict } from "@/lib/dict";
 import BlogCard from "@/components/blog-card";
 import { notFound } from "next/navigation";
 
 type PageParams = { lang?: string };
+
+export const metadata: Metadata = {
+  title: "Journal",
+  description:
+    "Read the Kairo journal for stories on Japanese craftsmanship, wabi-sabi design, mindful style, and the people behind our collections.",
+};
 
 export default async function BlogsPage({
   params,

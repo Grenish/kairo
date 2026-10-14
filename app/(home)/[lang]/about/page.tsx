@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { dict } from "@/lib/dict";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -5,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 type PageParams = { lang?: string };
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn the Kairo story: crafting quiet luxury since 2019 by bridging Japanese textile craftsmanship with contemporary fashion.",
+};
 
 export default async function AboutPage({
   params,

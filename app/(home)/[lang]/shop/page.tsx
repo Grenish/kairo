@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { Product } from "@/components/product-card";
 import { ShopInterface } from "@/components/shop/shop-interface";
 import { dict } from "@/lib/dict";
 import { getAllProducts } from "@/lib/products";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Shop",
+  description:
+    "Shop the full Kairo collection of Japanese-crafted apparel. Filter by category and price to find timeless pieces made to last.",
+};
 
 export default async function ShopPage({
   params,

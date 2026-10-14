@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getAllProducts } from "@/lib/products";
 import { ProductView } from "@/components/shop/product-view";
@@ -11,6 +12,27 @@ interface ProductPageProps {
     lang: "en" | "ja";
     slug: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const product = getProductBySlug(slug, lang);
+  if (!product) return { title: "Product Not Found" };
+  const description =
+    product.description.length > 160
+      ? `${product.description.slice(0, 157).trimEnd()}...`
+      : product.description;
+  return {
+    title: product.title,
+    description,
+    openGraph: {
+      title: product.title,
+      description,
+      images: [product.images[0]],
+    },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
