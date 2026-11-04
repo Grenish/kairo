@@ -1,99 +1,107 @@
-import { dict } from "@/lib/dict";
+import type { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { notFound } from "next/navigation";
+import { dict } from "@/lib/dict";
+import { isLocale, locales } from "@/lib/i18n";
+import { getProducts } from "@/lib/catalog";
+import { RelatedProducts } from "@/components/shop/related-products";
 
-type Props = {
-  params: Promise<{
-    lang: "en" | "ja";
-    slug: string;
-  }>;
-};
+type Params = Promise<{ lang: string; slug: string }>;
 
-export default async function BlogPostPage({ params }: Props) {
+export function generateStaticParams() {
+  return locales.flatMap((lang) =>
+    dict[lang].blogSection.posts.map((post) => ({ lang, slug: post.slug }))
+  );
+}
+
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { lang, slug } = await params;
+  if (!isLocale(lang)) return {};
+  const post = dict[lang].blogSection.posts.find((p) => p.slug === slug);
+  return post ? { title: post.title, description: post.excerpt } : {};
+}
 
-  const d = dict[lang];
-  if (!d) return notFound();
+export default async function BlogPostPage({ params }: { params: Params }) {
+  const { lang, slug } = await params;
+  if (!isLocale(lang)) notFound();
 
-  const post = d.blogSection.posts.find((p) => p.slug === slug);
-  if (!post) return notFound();
+  const t = dict[lang].blogSection;
+  const post = t.posts.find((p) => p.slug === slug);
+  if (!post) notFound();
+
+  const [first, ...rest] = post.content;
+  const more = t.posts.filter((p) => p.id !== post.id);
 
   return (
-    <article className="min-h-screen bg-background">
-      <div className="relative h-[60vh] w-full bg-muted">
-        <Image
-          src={post.image}
-          alt={post.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-          <Badge className="mb-4 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30 border-none">
-            {post.date}
-          </Badge>
-          <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-white md:text-6xl drop-shadow-md">
-            {post.title}
-          </h1>
-          <p className="mt-4 text-lg font-light text-white/90">
-            {post.readTime}
-          </p>
+    <article className="pt-12 lg:pt-20">
+      <header className="wrap grid gap-6 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <p className="text-ink-soft lg:col-span-12">
+          <Link href={`/${lang}/blogs`} className="link-quiet text-foreground">
+            {t.title}
+          </Link>
+          <span aria-hidden> / </span>
+          {post.date}, {post.readTime}
+        </p>
+        <h1 className="type-head text-head max-w-[16ch] lg:col-span-8">{post.title}</h1>
+        <p className="type-lead text-lead max-w-[30ch] first-letter:uppercase lg:col-span-4 lg:self-end">
+          {post.excerpt}
+        </p>
+      </header>
+
+      <div className="wrap mt-12 lg:mt-16">
+        <div className="load-open relative aspect-[4/3] overflow-hidden bg-paper lg:aspect-[16/8]">
+          <Image src={post.image} alt="" fill priority sizes="100vw" className="object-cover" />
         </div>
       </div>
 
-      <div className="w-full max-w-3xl mx-auto px-6 py-16 md:py-24">
-        <Link
-          href={`/${lang}`}
-          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground hover:underline underline-offset-4 mb-8 transition-colors"
-        >
-          <IconArrowLeft className="mr-2 h-4 w-4" />
-          {lang === "en" ? "Go Back" : "戻る"}
-        </Link>
-        <div className="prose prose-stone dark:prose-invert prose-lg max-w-none">
-          {post.content.map((paragraph, index) => (
-            <p key={index} className="leading-relaxed text-muted-foreground">
+      <div className="wrap mt-16 grid gap-8 lg:mt-24 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <p className="type-lead text-lead lg:col-span-5 lg:col-start-2" data-reveal>
+          {first}
+        </p>
+        <div className="grid gap-6 lg:col-span-5 lg:col-start-8">
+          {rest.map((paragraph, i) => (
+            <p key={i} className="max-w-[62ch]" data-reveal style={{ "--d": `${i * 80}ms` } as React.CSSProperties}>
               {paragraph}
             </p>
           ))}
         </div>
-
-        <div className="mt-16 pt-8 border-t">
-          <h3 className="text-2xl font-semibold tracking-tight mb-6">
-            {lang === "en" ? "More from the Journal" : "ジャーナルの他の記事"}
-          </h3>
-          <div className="grid gap-8 md:grid-cols-2">
-            {d.blogSection.posts
-              .filter((p) => p.id !== post.id)
-              .slice(0, 2)
-              .map((relatedPost) => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/${lang}/blogs/${relatedPost.slug}`}
-                  className="group block"
-                >
-                  <div className="relative aspect-video w-full overflow-hidden rounded-md bg-muted mb-4">
-                    <Image
-                      src={relatedPost.image}
-                      alt={relatedPost.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <h4 className="font-medium group-hover:underline underline-offset-4">
-                    {relatedPost.title}
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {relatedPost.readTime}
-                  </p>
-                </Link>
-              ))}
-          </div>
-        </div>
       </div>
+
+      <div className="wrap mt-32 lg:mt-48">
+        <RelatedProducts
+          title={lang === "ja" ? "コレクションから" : "From the collection"}
+          products={getProducts(lang).slice(0, 4)}
+          lang={lang}
+        />
+      </div>
+
+      <section aria-labelledby="more-title" className="wrap mt-32 lg:mt-48">
+        <h2 id="more-title" className="type-head text-head" data-reveal>
+          {lang === "ja" ? "ほかの記事" : "More from the journal"}
+        </h2>
+        <ul className="mt-12 grid gap-12 md:grid-cols-2 md:gap-x-(--gutter)">
+          {more.map((p) => (
+            <li key={p.id} data-reveal>
+              <Link href={`/${lang}/blogs/${p.slug}`} className="group block">
+                <span className="relative block aspect-[3/2] overflow-hidden bg-paper">
+                  <Image
+                    src={p.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-(--ease-out) group-hover:scale-[1.03]"
+                  />
+                </span>
+                <span className="type-lead text-lead mt-5 block font-medium">
+                  <span className="link-quiet group-hover:decoration-current">{p.title}</span>
+                </span>
+                <span className="mt-1 block text-ink-soft">{p.readTime}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </article>
   );
 }

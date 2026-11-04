@@ -8,28 +8,36 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { Product } from "@/components/product-card";
+import { priceOf } from "@/lib/catalog";
 
-export interface CartItem extends Product {
+/** A line in the bag. Product details are looked up from the catalogue when rendered. */
+export interface CartLine {
+  id: string;
+  size: string;
   quantity: number;
-  selectedSize: string;
 }
 
 interface CartStateContextType {
-  items: CartItem[];
+  lines: CartLine[];
   itemCount: number;
   subtotal: number;
   isCartOpen: boolean;
+  saved: string[];
+  hydrated: boolean;
 }
 
 interface CartActionsContextType {
-  addToCart: (product: Product, quantity: number, size: string) => void;
-  removeFromCart: (productId: string, size: string) => void;
-  updateQuantity: (productId: string, size: string, quantity: number) => void;
+  addToCart: (id: string, size: string, quantity?: number) => void;
+  removeFromCart: (id: string, size: string) => void;
+  updateQuantity: (id: string, size: string, quantity: number) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  toggleSaved: (id: string) => void;
 }
+
+const BAG_KEY = "kairo-bag-v2";
+const SAVED_KEY = "kairo-saved";
 
 const CartStateContext = createContext<CartStateContextType | undefined>(
   undefined
@@ -38,94 +46,92 @@ const CartActionsContext = createContext<CartActionsContextType | undefined>(
   undefined
 );
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
+function readList<T>(key: string, valid: (value: unknown) => value is T): T[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(valid) : [];
+  } catch {
+    return [];
+  }
+}
 
-  // Load from local storage on mount
+const isLine = (value: unknown): value is CartLine =>
+  typeof value === "object" &&
+  value !== null &&
+  typeof (value as CartLine).id === "string" &&
+  typeof (value as CartLine).size === "string" &&
+  typeof (value as CartLine).quantity === "number" &&
+  priceOf((value as CartLine).id) > 0;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [lines, setLines] = useState<CartLine[]>([]);
+  const [saved, setSaved] = useState<string[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
   useEffect(() => {
-    const savedCart = localStorage.getItem("kairo-cart");
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart from local storage", e);
-      }
-    }
-    setIsHydrated(true);
+    setLines(readList(BAG_KEY, isLine));
+    setSaved(readList(SAVED_KEY, isString));
+    setHydrated(true);
   }, []);
 
-  // Save to local storage whenever items change
   useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem("kairo-cart", JSON.stringify(items));
-    }
-  }, [items, isHydrated]);
+    if (hydrated) localStorage.setItem(BAG_KEY, JSON.stringify(lines));
+  }, [lines, hydrated]);
 
-  const addToCart = useCallback(
-    (product: Product, quantity: number, size: string) => {
-      setItems((prev) => {
-        const existingItemIndex = prev.findIndex(
-          (item) => item.id === product.id && item.selectedSize === size
+  useEffect(() => {
+    if (hydrated) localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+  }, [saved, hydrated]);
+
+  const addToCart = useCallback((id: string, size: string, quantity = 1) => {
+    setLines((prev) => {
+      const index = prev.findIndex((l) => l.id === id && l.size === size);
+      if (index > -1) {
+        return prev.map((l, i) =>
+          i === index ? { ...l, quantity: l.quantity + quantity } : l
         );
+      }
+      return [...prev, { id, size, quantity }];
+    });
+    setIsCartOpen(true);
+  }, []);
 
-        if (existingItemIndex > -1) {
-          const newItems = [...prev];
-          newItems[existingItemIndex].quantity += quantity;
-          return newItems;
-        }
-
-        return [...prev, { ...product, quantity, selectedSize: size }];
-      });
-      setIsCartOpen(true);
-    },
-    []
-  );
-
-  const removeFromCart = useCallback((productId: string, size: string) => {
-    setItems((prev) =>
-      prev.filter(
-        (item) => !(item.id === productId && item.selectedSize === size)
-      )
-    );
+  const removeFromCart = useCallback((id: string, size: string) => {
+    setLines((prev) => prev.filter((l) => !(l.id === id && l.size === size)));
   }, []);
 
   const updateQuantity = useCallback(
-    (productId: string, size: string, quantity: number) => {
+    (id: string, size: string, quantity: number) => {
       if (quantity < 1) return;
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === productId && item.selectedSize === size
-            ? { ...item, quantity }
-            : item
+      setLines((prev) =>
+        prev.map((l) =>
+          l.id === id && l.size === size ? { ...l, quantity } : l
         )
       );
     },
     []
   );
 
-  const clearCart = useCallback(() => {
-    setItems([]);
-  }, []);
-
+  const clearCart = useCallback(() => setLines([]), []);
   const openCart = useCallback(() => setIsCartOpen(true), []);
   const closeCart = useCallback(() => setIsCartOpen(false), []);
 
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const toggleSaved = useCallback((id: string) => {
+    setSaved((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  }, []);
+
+  const itemCount = lines.reduce((acc, l) => acc + l.quantity, 0);
+  const subtotal = lines.reduce((acc, l) => acc + priceOf(l.id) * l.quantity, 0);
 
   const stateValue = useMemo(
-    () => ({
-      items,
-      itemCount,
-      subtotal,
-      isCartOpen,
-    }),
-    [items, itemCount, subtotal, isCartOpen]
+    () => ({ lines, itemCount, subtotal, isCartOpen, saved, hydrated }),
+    [lines, itemCount, subtotal, isCartOpen, saved, hydrated]
   );
 
   const actionsValue = useMemo(
@@ -136,8 +142,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clearCart,
       openCart,
       closeCart,
+      toggleSaved,
     }),
-    [addToCart, removeFromCart, updateQuantity, clearCart, openCart, closeCart]
+    [
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      openCart,
+      closeCart,
+      toggleSaved,
+    ]
   );
 
   return (
@@ -165,7 +180,6 @@ export function useCartActions() {
   return context;
 }
 
-// Legacy hook for backward compatibility (combines both)
 export function useCart() {
   const state = useCartState();
   const actions = useCartActions();

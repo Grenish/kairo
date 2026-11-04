@@ -26,3 +26,18 @@ export function coerceLocale(
 ): Locale {
   return isLocale(value) ? value : fallback;
 }
+
+/** The locale a visitor switches to from `lang`. */
+export function otherLocale(lang: Locale): Locale {
+  return lang === "en" ? "ja" : "en";
+}
+
+/** Swap the locale segment of a pathname, keeping the rest of the route. */
+export function replaceLocale(pathname: string, next: Locale): string {
+  const parts = pathname.split("/");
+  if (isLocale(parts[1])) {
+    parts[1] = next;
+    return parts.join("/") || `/${next}`;
+  }
+  return `/${next}`;
+}

@@ -1,194 +1,193 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
-import ProfileHeader from "@/components/account/profile-header";
-import SidebarNav from "@/components/account/sidebar-nav";
-import { dict } from "@/lib/dict";
-import {
-  IconShoppingBag,
-  IconHeart,
-  IconStar,
-  IconBookmark,
-  IconPlus,
-  IconMapPin,
-  IconPhone,
-  IconBuilding,
-} from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { useParams } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
+import { useCartState } from "@/components/providers/cart-provider";
+import { ProductTile } from "@/components/shop/product-tile";
+import { dict, fill } from "@/lib/dict";
+import { coerceLocale } from "@/lib/i18n";
+import { formatYen, getProduct } from "@/lib/catalog";
+import { readOrders, type Order } from "@/lib/orders";
+import { cn } from "@/lib/utils";
+
+type Tab = "orders" | "saved" | "address";
 
 export default function AccountPage() {
   const params = useParams();
-  const lang = (params.lang as "en" | "ja") || "en";
-  const [activeTab, setActiveTab] = useState("orders");
+  const lang = coerceLocale(params.lang);
   const t = dict[lang].account;
+  const [tab, setTab] = useState<Tab>("orders");
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const { saved, hydrated } = useCartState();
 
-  const renderContent = () => {
-    if (activeTab === "address") {
-      return (
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Mock Address 1 */}
-          <div className="p-6 rounded-xl border bg-card text-card-foreground shadow-sm relative group hover:border-primary/50 transition-colors">
-            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button variant="ghost" size="sm" className="h-8">
-                Edit
-              </Button>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
-                <IconMapPin size={20} />
-              </div>
-              <div className="space-y-1">
-                <div className="font-semibold flex items-center gap-2">
-                  Default Address
-                  <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
-                    Default
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  <p>〒160-0023</p>
-                  <p>Tokyo, Shinjuku-ku</p>
-                  <p>1-13-2, Nishishinjuku</p>
-                  <p className="flex items-center gap-1.5 mt-1 text-foreground/80">
-                    <IconBuilding size={14} className="text-muted-foreground" />
-                    Shinjuku Building 3F
-                  </p>
-                  <p className="flex items-center gap-1.5 mt-2 text-foreground/80">
-                    <IconPhone size={14} className="text-muted-foreground" />
-                    03-1234-5678
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+  useEffect(() => setOrders(readOrders()), []);
 
-          {/* Mock Address 2 */}
-          <div className="p-6 rounded-xl border bg-card text-card-foreground shadow-sm relative group hover:border-primary/50 transition-colors">
-            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button variant="ghost" size="sm" className="h-8">
-                Edit
-              </Button>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-secondary text-muted-foreground shrink-0 group-hover:text-primary transition-colors">
-                <IconMapPin size={20} />
-              </div>
-              <div className="space-y-1">
-                <div className="font-semibold">Office</div>
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  <p>〒530-0001</p>
-                  <p>Osaka, Kita-ku</p>
-                  <p>2-5-1, Umeda</p>
-                  <p className="flex items-center gap-1.5 mt-1 text-foreground/80">
-                    <IconBuilding size={14} className="text-muted-foreground" />
-                    Osaka Tower 1205
-                  </p>
-                  <p className="flex items-center gap-1.5 mt-2 text-foreground/80">
-                    <IconPhone size={14} className="text-muted-foreground" />
-                    06-8765-4321
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+  const date = (iso: string) =>
+    new Intl.DateTimeFormat(lang === "ja" ? "ja-JP" : "en-GB", {
+      dateStyle: "long",
+      timeZone: "Asia/Tokyo",
+    }).format(new Date(iso));
 
-    const emptyState = t.empty;
-
-    let icon, title, desc;
-
-    switch (activeTab) {
-      case "orders":
-        icon = IconShoppingBag;
-        title = emptyState.orders;
-        desc = emptyState.ordersDesc;
-        break;
-      case "wishlist":
-        icon = IconHeart;
-        title = emptyState.wishlist;
-        desc = emptyState.wishlistDesc;
-        break;
-      case "reviews":
-        icon = IconStar;
-        title = emptyState.reviews;
-        desc = emptyState.reviewsDesc;
-        break;
-      case "saved":
-        icon = IconBookmark;
-        title = emptyState.saved;
-        desc = emptyState.savedDesc;
-        break;
-      default:
-        return null;
-    }
-
-    const Icon = icon!;
-
-    return (
-      <div className="min-h-[400px] flex items-center justify-center rounded-2xl border border-dashed bg-secondary/5">
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon" className="bg-background shadow-sm">
-              <Icon size={24} stroke={1.5} />
-            </EmptyMedia>
-            <EmptyTitle>{title}</EmptyTitle>
-            <EmptyDescription>{desc}</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <Button asChild>
-              <Link href={`/${lang}/shop`}>{emptyState.action}</Link>
-            </Button>
-          </EmptyContent>
-        </Empty>
-      </div>
-    );
-  };
+  const tabs: { id: Tab; label: string; count?: number }[] = [
+    { id: "orders", label: t.tabs.orders, count: orders?.length },
+    { id: "saved", label: t.tabs.saved, count: hydrated ? saved.length : undefined },
+    { id: "address", label: t.tabs.address, count: t.addresses.length },
+  ];
 
   return (
-    <div className="min-h-screen pb-20">
-      <ProfileHeader lang={lang} />
-
-      <main className="mx-auto w-full max-w-5xl px-4 mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <SidebarNav
-              lang={lang}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6 min-h-[500px]">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">
-                  {t.tabs[activeTab as keyof typeof t.tabs]}
-                </h2>
-                {activeTab === "address" && (
-                  <Button size="sm" className="gap-2">
-                    <IconPlus size={16} />
-                    Add New
-                  </Button>
-                )}
-              </div>
-              {renderContent()}
-            </div>
-          </div>
+    <div className="wrap pt-12 lg:pt-20">
+      <header className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-x-(--gutter)">
+        <h1 className="type-display text-display -ml-[0.04em] lg:col-span-7">{t.title}</h1>
+        <div className="lg:col-span-4 lg:col-start-9">
+          <p className="type-lead text-lead max-w-[30ch]">{t.intro}</p>
+          <p className="mt-4 flex gap-6">
+            <Link href={`/${lang}/settings`} className="link-quiet underline">
+              {t.settings}
+            </Link>
+            <Link href={`/${lang}/login`} className="link-quiet underline">
+              {t.signIn}
+            </Link>
+          </p>
         </div>
-      </main>
+      </header>
+
+      <div role="tablist" aria-label={t.title} className="mt-16 flex flex-wrap gap-x-8 gap-y-2 text-lead">
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            id={`tab-${item.id}`}
+            role="tab"
+            type="button"
+            aria-selected={tab === item.id}
+            aria-controls={`panel-${item.id}`}
+            onClick={() => setTab(item.id)}
+            className={cn(
+              "link-quiet py-1",
+              tab === item.id ? "underline decoration-current" : "text-ink-soft hover:text-foreground"
+            )}
+          >
+            {item.label}
+            {item.count !== undefined && (
+              <span className="tabular ml-1.5 align-super text-small">{item.count}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div id={`panel-${tab}`} role="tabpanel" aria-labelledby={`tab-${tab}`} className="mt-10">
+        {tab === "orders" &&
+          (orders === null ? (
+            <div className="min-h-[30svh]" />
+          ) : orders.length === 0 ? (
+            <Empty title={t.empty.orders} body={t.empty.ordersDesc} action={t.empty.action} href={`/${lang}/shop`} />
+          ) : (
+            <ul className="grid gap-2">
+              {orders.map((order) => (
+                <li key={order.id} className="grid gap-6 bg-surface p-6 md:grid-cols-12 md:gap-x-(--gutter) md:p-8">
+                  <div className="md:col-span-4">
+                    <p className="type-lead text-lead tabular font-medium">{order.id}</p>
+                    <p className="mt-1 text-ink-soft">{fill(t.order.placed, { date: date(order.placedAt) })}</p>
+                  </div>
+                  <ul className="flex flex-wrap gap-2 md:col-span-4">
+                    {order.lines.map((line) => {
+                      const product = getProduct(line.id, lang);
+                      if (!product) return null;
+                      return (
+                        <li key={`${line.id}-${line.size}`}>
+                          <Link
+                            href={`/${lang}/shop/${product.slug}`}
+                            className="relative block aspect-[4/5] w-16 overflow-hidden bg-paper"
+                            aria-label={`${product.title}, ${line.size} × ${line.quantity}`}
+                          >
+                            <Image src={product.worn} alt="" fill sizes="64px" className="object-cover" />
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <dl className="tabular grid gap-1 md:col-span-4 md:text-right">
+                    <div className="flex justify-between gap-4 md:justify-end">
+                      <dt className="text-ink-soft">{t.order.slot}</dt>
+                      <dd>{order.slot}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4 md:justify-end">
+                      <dt className="text-ink-soft">{t.order.payment}</dt>
+                      <dd>{order.payment}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4 pt-2 text-lead font-medium md:justify-end">
+                      <dt>{t.order.total}</dt>
+                      <dd>{formatYen(order.total)}</dd>
+                    </div>
+                  </dl>
+                </li>
+              ))}
+            </ul>
+          ))}
+
+        {tab === "saved" &&
+          (!hydrated ? (
+            <div className="min-h-[30svh]" />
+          ) : saved.length === 0 ? (
+            <Empty title={t.empty.saved} body={t.empty.savedDesc} action={t.empty.action} href={`/${lang}/shop`} />
+          ) : (
+            <ul className="grid grid-cols-2 gap-x-(--gutter) gap-y-12 lg:grid-cols-4">
+              {saved.map((id) => {
+                const product = getProduct(id, lang);
+                return product ? (
+                  <li key={id}>
+                    <ProductTile product={product} lang={lang} />
+                  </li>
+                ) : null;
+              })}
+            </ul>
+          ))}
+
+        {tab === "address" && (
+          <ul className="grid gap-2 md:grid-cols-2">
+            {t.addresses.map((address) => (
+              <li key={address.label} className="bg-surface p-6 md:p-8">
+                <p className="type-lead text-lead font-medium">
+                  {address.label}
+                  {address.isDefault && <span className="ml-3 text-body font-normal text-ink-soft">{t.defaultAddress}</span>}
+                </p>
+                <address className="mt-4 not-italic">
+                  {address.lines.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                  <span className="tabular mt-2 block text-ink-soft">{address.phone}</span>
+                </address>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Empty({
+  title,
+  body,
+  action,
+  href,
+}: {
+  title: string;
+  body: string;
+  action: string;
+  href: string;
+}) {
+  return (
+    <div className="grid min-h-[36svh] content-center gap-4 bg-surface p-8 md:p-14">
+      <p className="type-lead text-lead">{title}</p>
+      <p className="max-w-[44ch] text-ink-soft">{body}</p>
+      <Link href={href} className={cn(buttonVariants(), "mt-2 justify-self-start")}>
+        {action}
+      </Link>
     </div>
   );
 }

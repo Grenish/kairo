@@ -1,19 +1,21 @@
 import { notFound } from "next/navigation";
-import { isLocale } from "@/lib/i18n";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import { isLocale, locales } from "@/lib/i18n";
+import { SiteHeader } from "@/components/site/header";
+import { SiteFooter } from "@/components/site/footer";
+import { HtmlLang } from "@/components/site/html-lang";
 
-type LayoutParams = { lang?: string };
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
 
 export default async function LangLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<LayoutParams> | LayoutParams;
+  params: Promise<{ lang: string }>;
 }) {
-  const resolvedParams = await Promise.resolve(params);
-  const lang = resolvedParams?.lang;
+  const { lang } = await params;
 
   if (!isLocale(lang)) {
     notFound();
@@ -22,9 +24,12 @@ export default async function LangLayout({
   // Do NOT render <html>/<body> here since RootLayout already owns those tags.
   return (
     <>
-      <Navbar />
-      {children}
-      <Footer lang={lang} />
+      <HtmlLang lang={lang} />
+      <SiteHeader lang={lang} />
+      <main id="main" className="pt-(--header)">
+        {children}
+      </main>
+      <SiteFooter lang={lang} />
     </>
   );
 }

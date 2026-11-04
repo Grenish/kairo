@@ -2,127 +2,123 @@ export const about = {
   en: {
     hero: {
       tagline: "Our Story",
-      title: "Crafting Quiet Luxury Since 2019",
+      title: "Crafting quiet luxury since 2019",
       description:
         "Born from a deep appreciation for Japanese textile craftsmanship and a vision for understated elegance, Kairo bridges the gap between tradition and contemporary fashion.",
     },
     mission: {
-      title: "Our Mission",
+      title: "Our mission",
       description:
         "To create garments that speak through quality rather than logos. We believe true luxury lies in the details—the weight of the fabric, the precision of the stitch, the way a piece moves with you.",
       values: [
         {
-          title: "Quality Over Quantity",
+          title: "Quality over quantity",
           description:
             "Every piece is crafted with intention, using only the finest materials sourced from artisan mills.",
         },
         {
-          title: "Timeless Design",
+          title: "Timeless design",
           description:
             "We create pieces meant to last beyond seasons, becoming staples of a refined wardrobe.",
         },
         {
-          title: "Sustainable Practice",
+          title: "Sustainable practice",
           description:
             "Our commitment to the environment shapes every decision, from sourcing to shipping.",
         },
       ],
     },
     history: {
-      title: "Our Journey",
-      subtitle: "From Vision to Reality",
+      title: "Our journey",
+      subtitle: "From vision to reality",
       timeline: [
         {
           year: "2019",
-          title: "The Beginning",
+          title: "The beginning",
           description:
             "Founded in Tokyo with a small atelier, focusing on made-to-order pieces that celebrated Japanese textile traditions.",
         },
         {
           year: "2020",
-          title: "Digital Expansion",
+          title: "Digital expansion",
           description:
             "Launched our online presence, bringing quiet luxury to discerning customers worldwide during challenging times.",
         },
         {
           year: "2022",
-          title: "Material Innovation",
+          title: "Material innovation",
           description:
             "Partnered with heritage mills in Kyoto to develop exclusive fabrics blending traditional techniques with modern sustainability.",
         },
         {
           year: "2024",
-          title: "Global Recognition",
+          title: "Global recognition",
           description:
             "Celebrated for our commitment to understated elegance, with flagship experiences in Tokyo and select international showrooms.",
         },
       ],
     },
     operations: {
-      title: "How We Operate",
-      subtitle: "Transparency in Every Thread",
+      title: "How we work",
+      subtitle: "Transparency in every thread",
       description:
         "From design to delivery, every step is guided by our commitment to excellence and sustainability.",
       steps: [
         {
-          number: "01",
           title: "Design",
           description:
             "Our designers draw inspiration from nature, architecture, and Japanese aesthetics to create timeless silhouettes.",
         },
         {
-          number: "02",
           title: "Sourcing",
           description:
             "We partner exclusively with certified mills that share our values of quality, fair labor, and environmental responsibility.",
         },
         {
-          number: "03",
           title: "Crafting",
           description:
             "Each garment is carefully constructed by skilled artisans, with meticulous attention to every seam and finish.",
         },
         {
-          number: "04",
-          title: "Quality Control",
+          title: "Quality control",
           description:
             "Rigorous inspection ensures every piece meets our exacting standards before it reaches you.",
         },
       ],
     },
     providers: {
-      title: "For Our Partners",
-      subtitle: "Growing Together",
+      title: "For our partners",
+      subtitle: "Growing together",
       description:
         "We believe in nurturing relationships that benefit everyone in our supply chain. Here's how partnering with Kairo creates value.",
       benefits: [
         {
-          title: "Fair Compensation",
+          title: "Fair compensation",
           description:
             "We pay above-market rates to ensure our partners can invest in their craft and communities.",
         },
         {
-          title: "Long-term Commitment",
+          title: "Long-term commitment",
           description:
             "We build lasting relationships, providing stability that allows artisans to focus on their craft.",
         },
         {
-          title: "Skill Development",
+          title: "Skill development",
           description:
             "We invest in training programs that help preserve traditional techniques while introducing modern methods.",
         },
         {
-          title: "Sustainable Growth",
+          title: "Sustainable growth",
           description:
             "Together, we develop practices that protect both livelihoods and the environment for future generations.",
         },
       ],
     },
     cta: {
-      title: "Experience Quiet Luxury",
+      title: "Experience quiet luxury",
       description:
         "Discover pieces that speak through quality, not volume. Each garment tells a story of craftsmanship and care.",
-      button: "Explore Collection",
+      button: "Explore the collection",
     },
   },
   ja: {
@@ -191,25 +187,21 @@ export const about = {
         "デザインから配送まで、すべてのステップは卓越性とサステナビリティへのコミットメントに導かれています。",
       steps: [
         {
-          number: "01",
           title: "デザイン",
           description:
             "デザイナーたちは自然、建築、日本の美学からインスピレーションを得て、タイムレスなシルエットを創造します。",
         },
         {
-          number: "02",
           title: "調達",
           description:
             "品質、公正な労働、環境責任という私たちの価値観を共有する認定工場とのみ提携しています。",
         },
         {
-          number: "03",
           title: "製作",
           description:
             "熟練した職人が、すべての縫い目と仕上げに細心の注意を払い、丁寧に仕立てます。",
         },
         {
-          number: "04",
           title: "品質管理",
           description:
             "厳格な検査により、お客様のもとへ届く前にすべての作品が私たちの厳しい基準を満たしていることを確認します。",

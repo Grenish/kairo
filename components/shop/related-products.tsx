@@ -1,34 +1,29 @@
-import ProductCard, { Product } from "@/components/product-card";
+import type { Product } from "@/lib/catalog";
+import type { Locale } from "@/lib/i18n";
+import { ProductTile } from "./product-tile";
 
-interface RelatedProductsProps {
-  title: string;
-  products: Product[];
-  lang: string;
-  addToCartText: string;
-}
-
+/** Four more pieces, each another word, at the foot of a product page. */
 export function RelatedProducts({
   title,
   products,
   lang,
-  addToCartText,
-}: RelatedProductsProps) {
-  if (products.length === 0) return null;
-
+}: {
+  title: string;
+  products: Product[];
+  lang: Locale;
+}) {
   return (
-    <section className="py-12 border-t">
-      <h2 className="text-2xl font-bold mb-8">{title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-        {products.map((product, index) => (
-          <ProductCard
-            key={`${product.id}-${index}`} // Using index to ensure uniqueness if products are generic
-            product={product}
-            addToCartText={addToCartText}
-            lang={lang}
-            className="h-full"
-          />
+    <section aria-labelledby="related-title">
+      <h2 id="related-title" className="type-head text-head" data-reveal>
+        {title}
+      </h2>
+      <ul className="mt-12 grid grid-cols-2 gap-x-(--gutter) gap-y-12 lg:grid-cols-4">
+        {products.map((product, i) => (
+          <li key={product.id} data-reveal style={{ "--d": `${i * 70}ms` } as React.CSSProperties}>
+            <ProductTile product={product} lang={lang} />
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

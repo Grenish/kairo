@@ -1,200 +1,190 @@
-import { dict } from "@/lib/dict";
-import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { notFound } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
+import { dict } from "@/lib/dict";
+import { isLocale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
-type PageParams = { lang?: string };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+  return { title: dict[lang].nav.about, description: dict[lang].about.hero.description };
+}
 
 export default async function AboutPage({
   params,
 }: {
-  params: Promise<PageParams> | PageParams;
+  params: Promise<{ lang: string }>;
 }) {
-  const resolvedParams = await Promise.resolve(params);
-  const lang = resolvedParams?.lang;
-
-  if (lang !== "en" && lang !== "ja") notFound();
-
+  const { lang } = await params;
+  if (!isLocale(lang)) notFound();
   const t = dict[lang].about;
 
   return (
-    <main className="min-h-svh bg-background text-foreground">
-      <section className="relative px-6 py-32 md:py-48 flex flex-col bg-interior bg-cover bg-center items-center justify-center text-center">
-        <div className="absolute inset-0 bg-linear-to-b from-transparent to-background" />
-        <div className="relative max-w-4xl mx-auto space-y-6">
-          <span className="text-xs font-md tracking-wider uppercase text-muted-foreground">
-            {t.hero.tagline}
-          </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight">
-            {t.hero.title}
-          </h1>
-          <p className="text-lg sm:text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
-            {t.hero.description}
+    <div className="pt-12 lg:pt-20">
+      {/* The statement and the room it was made in. */}
+      <section className="wrap grid gap-8 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <h1 className="type-head text-head max-w-[13ch] lg:col-span-8">{t.hero.title}</h1>
+        <p
+          className="load-rise type-lead text-lead max-w-[30ch] lg:col-span-4 lg:self-end"
+          style={{ "--d": "300ms" } as React.CSSProperties}
+        >
+          {t.hero.description}
+        </p>
+        <div className="load-open relative mt-6 aspect-[4/3] overflow-hidden bg-paper lg:col-span-12 lg:aspect-[16/7]">
+          <Image
+            src="/interior.png"
+            alt={lang === "ja" ? "障子とハンガーラックのあるアトリエの一室" : "A room in the atelier with shoji screens and a single clothes rail"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+      </section>
+
+      {/* Mission: one paragraph, three values. */}
+      <section aria-labelledby="mission-title" className="wrap mt-32 grid gap-12 lg:mt-48 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <div className="lg:col-span-5">
+          <h2 id="mission-title" className="type-head text-head" data-reveal>
+            {t.mission.title}
+          </h2>
+          <p className="type-lead text-lead mt-8 max-w-[30ch]" data-reveal>
+            {t.mission.description}
           </p>
         </div>
+        <ul className="grid gap-2 self-end lg:col-span-6 lg:col-start-7">
+          {t.mission.values.map((value, i) => (
+            <li
+              key={value.title}
+              className="grid gap-2 bg-surface p-6 md:grid-cols-[14ch_1fr] md:gap-8 md:p-8"
+              data-reveal
+              style={{ "--d": `${i * 80}ms` } as React.CSSProperties}
+            >
+              <h3 className="type-lead text-lead font-medium">{value.title}</h3>
+              <p>{value.description}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <section className="px-6 py-24 border-b border-border/40">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 lg:gap-24">
-          <div className="lg:col-span-4">
-            <h2 className="text-3xl font-light tracking-tight mb-6">
-              {t.mission.title}
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {t.mission.description}
-            </p>
-          </div>
-          <div className="lg:col-span-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {t.mission.values.map((value, index) => (
-              <div key={index} className="space-y-4">
-                <span className="block text-sm font-mono text-muted-foreground/60">
-                  0{index + 1}
-                </span>
-                <h3 className="text-lg font-medium">{value.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {value.description}
-                </p>
-              </div>
-            ))}
-          </div>
+      {/* Journey: the shop held on the left while the years pass on the right. */}
+      <section id="journey" aria-labelledby="journey-title" className="mt-32 lg:mt-48">
+        <div className="wrap">
+          <h2 id="journey-title" className="type-head text-head" data-reveal>
+            {t.history.title}
+          </h2>
         </div>
-      </section>
-
-      <section className="relative border-b border-border/40" id="journey">
-        <div className="lg:grid lg:grid-cols-2">
-          <div className="hidden lg:flex sticky top-0 h-screen w-full flex-col items-center justify-center text-center p-12 border-r border-border/40 bg-store bg-cover bg-no-repeat">
-            <div className="absolute inset-0 bg-background/20" />
-            <div className="relative z-10 space-y-4 bg-background/20 p-12 backdrop-blur-sm">
-              <span className="text-xs font-thin tracking-[0.2em] uppercase">
-                {t.history.subtitle}
-              </span>
-              <h2 className="text-4xl font-thin tracking-tight">
-                {t.history.title}
-              </h2>
+        <div className="wrap mt-12 grid gap-12 lg:grid-cols-12 lg:gap-x-(--gutter)">
+          <div className="lg:col-span-6">
+            <div className="relative aspect-[4/3] overflow-hidden bg-paper lg:sticky lg:top-[calc(var(--header)+2rem)] lg:aspect-[4/5]">
+              <Image
+                src="/store.png"
+                alt={lang === "ja" ? "東京の通りに建つKairoのショップ" : "The Kairo shop on its Tokyo street"}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-[35%_50%]"
+              />
             </div>
           </div>
-
-          <div className="lg:hidden p-12 text-center bg-accent/5 border-b border-border/40">
-            <span className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground block mb-2">
-              {t.history.subtitle}
-            </span>
-            <h2 className="text-3xl font-light tracking-tight text-primary">
-              {t.history.title}
-            </h2>
-          </div>
-
-          <div className="w-full">
-            {t.history.timeline.map((item, index) => (
-              <div
-                key={index}
-                className="min-h-[50vh] lg:min-h-screen flex flex-col justify-center px-12 py-16 bg-background border-b last:border-b-0 border-border/40 lg:border-none"
-              >
-                <div className="max-w-lg mx-auto w-full space-y-6">
-                  <span className="inline-block text-6xl font-light text-primary tabular-nums">
-                    {item.year}
-                  </span>
-                  <div className="space-y-4">
-                    <h3 className="text-2xl font-medium tracking-tight">
-                      {item.title}
-                    </h3>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <ol className="grid gap-16 lg:col-span-5 lg:col-start-8 lg:gap-0">
+            {t.history.timeline.map((item) => (
+              <li key={item.year} className="lg:flex lg:min-h-[70svh] lg:flex-col lg:justify-center" data-reveal>
+                <p className="type-display text-display tabular">{item.year}</p>
+                <h3 className="type-lead text-lead mt-4 font-medium">{item.title}</h3>
+                <p className="mt-3 max-w-[40ch]">{item.description}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      <section className="px-6 py-24 border-b border-border/40">
-        <div className="max-w-7xl mx-auto space-y-16">
-          <div className="max-w-2xl">
-            <span className="block text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground/80 mb-4">
-              {t.operations.subtitle}
-            </span>
-            <h2 className="text-3xl font-light tracking-tight mb-6">
-              {t.operations.title}
-            </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              {t.operations.description}
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-border/60">
-            {t.operations.steps.map((step, index) => (
-              <div
-                key={index}
-                className="p-8 border-r border-b border-border/60 space-y-6"
-              >
-                <span className="text-xs font-mono text-muted-foreground/60">
-                  STEP {step.number}
-                </span>
-                <h3 className="text-lg font-medium">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            ))}
-          </div>
+      {/* How we work: four stages read left to right. */}
+      <section aria-labelledby="work-title" className="wrap mt-32 lg:mt-48">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-x-(--gutter)">
+          <h2 id="work-title" className="type-head text-head lg:col-span-6" data-reveal>
+            {t.operations.title}
+          </h2>
+          <p className="type-lead text-lead max-w-[32ch] lg:col-span-5 lg:col-start-8 lg:self-end" data-reveal>
+            {t.operations.description}
+          </p>
         </div>
+        <ol className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-(--gutter)">
+          {t.operations.steps.map((step, i) => (
+            <li
+              key={step.title}
+              data-reveal
+              style={{ "--d": `${i * 80}ms` } as React.CSSProperties}
+            >
+              <h3 className="type-lead text-lead font-medium">{step.title}</h3>
+              <p className="mt-4">{step.description}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="px-6 py-24 bg-accent/5">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-32 items-start">
-          <div className="space-y-6 lg:sticky lg:top-24">
-            <div>
-              <span className="block text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground/80 mb-4">
-                {t.providers.subtitle}
-              </span>
-              <h2 className="text-3xl font-light tracking-tight mb-6">
-                {t.providers.title}
-              </h2>
-            </div>
-            <p className="text-muted-foreground text-lg leading-relaxed">
+      {/* Partners: the promise held while the four commitments scroll by. */}
+      <section aria-labelledby="partners-title" className="wrap mt-32 grid gap-12 lg:mt-48 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-[calc(var(--header)+2rem)]">
+            <h2 id="partners-title" className="type-head text-head" data-reveal>
+              {t.providers.title}
+            </h2>
+            <p className="mt-8 max-w-[40ch]" data-reveal>
               {t.providers.description}
             </p>
-            <div className="pt-8">
-              <Button
-                asChild
-                variant="default"
-                size="lg"
-                className="rounded-none px-8"
-              >
-                <Link href={`/${lang}/shop`}>{t.cta.button}</Link>
-              </Button>
+            <div className="relative mt-10 aspect-[4/3] overflow-hidden bg-paper" data-reveal="mask">
+              <Image
+                src="/threads.png"
+                alt={lang === "ja" ? "草原に並ぶ、Kairoを着た六人" : "Six people in Kairo clothing in a field of tall grass"}
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
             </div>
           </div>
+        </div>
+        <ul className="grid gap-12 lg:col-span-6 lg:col-start-7">
+          {t.providers.benefits.map((benefit) => (
+            <li key={benefit.title} data-reveal>
+              <h3 className="type-lead text-lead font-medium">{benefit.title}</h3>
+              <p className="mt-3 max-w-[48ch]">{benefit.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          <div className="space-y-12">
-            {t.providers.benefits.map((benefit, index) => (
-              <div
-                key={index}
-                className="border-l-2 border-primary/10 pl-8 py-2"
-              >
-                <h3 className="text-xl font-medium mb-3">{benefit.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {benefit.description}
-                </p>
-              </div>
-            ))}
+      {/* Close: the one centred moment on the page. */}
+      <section aria-labelledby="cta-title" className="mt-32 lg:mt-48">
+        <div className="wrap flex flex-col items-center text-center">
+          <h2 id="cta-title" className="type-head text-head max-w-[14ch]" data-reveal>
+            {t.cta.title}
+          </h2>
+          <p className="mt-6 max-w-[40ch]" data-reveal>
+            {t.cta.description}
+          </p>
+          <Link href={`/${lang}/shop`} className={cn(buttonVariants({ size: "lg" }), "mt-10")}>
+            {t.cta.button}
+          </Link>
+        </div>
+        <div className="wrap mt-16">
+          <div className="relative aspect-[4/3] overflow-hidden bg-paper lg:aspect-[16/7]" data-reveal="mask">
+            <Image
+              src="/models-bg.png"
+              alt={lang === "ja" ? "草原に立つ、Kairoを着た五人" : "Five people in Kairo clothing standing in a field of grass"}
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
-
-      <section className="px-6 py-32 text-center bg-background">
-        <div className="max-w-2xl mx-auto space-y-8">
-          <h2 className="text-3xl sm:text-4xl font-light tracking-tight text-primary">
-            {t.cta.title}
-          </h2>
-          <Separator className="w-12 mx-auto bg-primary/20" />
-          <p className="text-muted-foreground leading-relaxed">
-            {t.cta.description}
-          </p>
-        </div>
-      </section>
-    </main>
+    </div>
   );
 }

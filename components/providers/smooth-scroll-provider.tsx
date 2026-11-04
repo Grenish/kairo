@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -12,37 +12,25 @@ export function SmoothScrollProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const lenisRef = useRef<Lenis | null>(null);
-
   useEffect(() => {
+    // Weight, not a slide: wheel smoothing only, off for reduced motion. Touch stays native.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
-      orientation: "vertical",
-      gestureOrientation: "vertical",
+      lerp: 0.12,
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
+      anchors: true,
     });
 
-    lenisRef.current = lenis;
-
-    // Synchronize Lenis with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
-    // Add Lenis's requestAnimationFrame to GSAP's ticker
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
-    // Disable lag smoothing in GSAP to prevent jumpiness
+    const raf = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      gsap.ticker.remove(raf);
       lenis.destroy();
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000);
-      });
     };
   }, []);
 

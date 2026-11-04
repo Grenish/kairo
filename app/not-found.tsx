@@ -1,94 +1,63 @@
 "use client";
 
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  IconArrowLeft,
-  IconError404,
-  IconGlobe,
-  IconHome,
-  IconRss,
-  IconSearch,
-} from "@tabler/icons-react";
+import { useState } from "react";
 import Link from "next/link";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { useParams } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
+import { SearchDialog } from "@/components/site/search-dialog";
+import { dict } from "@/lib/dict";
+import { coerceLocale } from "@/lib/i18n";
+import { getProducts } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
-import { useParams, useRouter } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
 
 export default function NotFound() {
   const params = useParams();
-  const router = useRouter();
-  const lang = (params?.lang as string) || "en";
+  const lang = coerceLocale(params?.lang);
+  const t = dict[lang];
+  const [searchOpen, setSearchOpen] = useState(false);
+  const words = getProducts(lang);
 
   return (
-    <div className="min-h-svh flex items-center justify-center bg-muted/20 p-6">
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia>
-            <IconError404 className="w-8 h-8 text-primary" />
-          </EmptyMedia>
-          <EmptyTitle>Sorry, page not found</EmptyTitle>
-          <EmptyDescription>
-            The page you are looking for doesn't exist or has been moved.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent className="space-y-2">
-          <InputGroup className="w-full">
-            <InputGroupAddon>
-              <IconSearch className="w-4 h-4 text-muted-foreground" />
-            </InputGroupAddon>
-            <InputGroupInput placeholder="Search for products..." />
-          </InputGroup>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Link
-              href={`/${lang}/blogs`}
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "h-24 flex-col gap-2"
-              )}
-            >
-              <IconRss />
-              <span className="font-medium">Blogs</span>
+    <div className="wrap flex min-h-svh flex-col py-6">
+      <Link href={`/${lang}`} className="self-start text-[1.375rem] font-medium tracking-[-0.04em]">
+        Kairo
+      </Link>
+      <main id="main" className="grid flex-1 content-center gap-10 py-16 lg:grid-cols-12 lg:gap-x-(--gutter)">
+        <div className="lg:col-span-7">
+          <p lang="ja" aria-hidden className="type-display text-display text-ink-soft">
+            無
+          </p>
+          <h1 className="type-head text-head mt-6 max-w-[14ch]">{t.notFound.title}</h1>
+          <p className="mt-6 max-w-[44ch]">{t.notFound.body}</p>
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <Link href={`/${lang}/shop`} className={cn(buttonVariants({ size: "lg" }))}>
+              {t.notFound.shop}
             </Link>
-            <Link
-              href={`/${lang}/collection`} // Redirect to home/collection
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "h-24 flex-col gap-2"
-              )}
-            >
-              <IconGlobe />
-              <span className="font-medium">Collection</span>
-            </Link>
+            <button type="button" onClick={() => setSearchOpen(true)} className="link-quiet underline">
+              {t.nav.search}
+            </button>
           </div>
-
-          <div className="w-full pt-2">
-            <Button
-              variant={"ghost"}
-              className="w-full"
-              onClick={() => router.back()}
-            >
-              <IconArrowLeft />
-              Go Back
-            </Button>
-          </div>
-        </EmptyContent>
-      </Empty>
+        </div>
+        <ul className="grid content-end gap-1 lg:col-span-4 lg:col-start-9">
+          {words.map((p) => (
+            <li key={p.id}>
+              <Link
+                href={`/${lang}/shop/${p.slug}`}
+                className="press flex items-baseline justify-between gap-4 bg-surface px-4 py-3 hover:bg-surface-2"
+              >
+                <span>
+                  <span lang="ja" className="mr-3 text-[1.25rem]">
+                    {p.word}
+                  </span>
+                  {p.say}
+                </span>
+                <span className="text-ink-soft">{p.aside}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </main>
+      <SearchDialog lang={lang} open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }

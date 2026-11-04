@@ -1,113 +1,73 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import CartItemCard from "@/components/cart-item-card";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/components/providers/cart-provider";
-import { dict } from "@/lib/dict";
-import { useParams } from "next/navigation";
-import { IconShoppingBag } from "@tabler/icons-react";
 import Link from "next/link";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import { getProductById } from "@/lib/products";
+import { useParams } from "next/navigation";
+import { buttonVariants } from "@/components/ui/button";
+import { useCartState } from "@/components/providers/cart-provider";
+import { BagLines } from "@/components/site/bag-lines";
+import { FreeShippingNote } from "@/components/site/bag-drawer";
+import { dict } from "@/lib/dict";
+import { coerceLocale } from "@/lib/i18n";
+import { formatYen } from "@/lib/catalog";
+import { orderTotals } from "@/lib/orders";
+import { cn } from "@/lib/utils";
 
 export default function CartPage() {
-  const { items, subtotal, removeFromCart, updateQuantity } = useCart();
   const params = useParams();
-  const lang = (params.lang as "en" | "ja") || "en";
-  const t = dict[lang].cart;
-
-  const shipping = 500;
-  const total = subtotal + shipping;
-
-  if (items.length === 0) {
-    return (
-      <div className="w-full min-h-svh h-full py-20 px-4 flex items-center justify-center">
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant={"icon"}>
-              <IconShoppingBag />
-            </EmptyMedia>
-            <EmptyTitle>{t.emptyCart}</EmptyTitle>
-            <EmptyDescription>{t.emptyCartDesc}</EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <div className="flex items-center gap-2 justify-center">
-              <Button asChild>
-                <Link href={`/${lang}/shop`}>{t.continueShopping}</Link>
-              </Button>
-            </div>
-          </EmptyContent>
-        </Empty>
-      </div>
-    );
-  }
+  const lang = coerceLocale(params.lang);
+  const t = dict[lang];
+  const { lines, hydrated } = useCartState();
+  const totals = orderTotals(lines);
 
   return (
-    <div className="w-full min-h-svh h-full py-10 px-4">
-      <div className="max-w-7xl w-full mx-auto my-10">
-        <h1 className="text-3xl font-bold mb-8">{t.yourCart}</h1>
+    <div className="wrap pt-12 lg:pt-20">
+      <h1 className="type-display text-display -ml-[0.04em]">{t.cartPage.title}</h1>
 
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Cart Items List */}
-          <div className="flex-1 space-y-6">
-            {items.map((item) => {
-              const translated = getProductById(item.id!, lang) || item;
-              return (
-                <CartItemCard
-                  key={`${item.id}-${item.selectedSize}`}
-                  image={item.images[0]}
-                  description={translated.description}
-                  name={translated.title}
-                  size={item.selectedSize}
-                  price={item.price}
-                  quantity={item.quantity}
-                  onUpdateQuantity={(q) =>
-                    updateQuantity(item.id!, item.selectedSize, q)
-                  }
-                  onRemove={() => removeFromCart(item.id!, item.selectedSize)}
-                />
-              );
-            })}
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:w-96 shrink-0">
-            <div className="sticky top-20 rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-6">{t.orderSummary}</h2>
-
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t.subtotal}</span>
-                  <span>¥{subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t.shipping}</span>
-                  <span>¥{shipping.toLocaleString()}</span>
-                </div>
-
-                <Separator className="my-4" />
-
-                <div className="flex justify-between font-medium text-lg">
-                  <span>{t.total}</span>
-                  <span>¥{total.toLocaleString()}</span>
-                </div>
-
-                <Button className="w-full mt-6" size="lg">
-                  {t.checkout}
-                </Button>
-              </div>
-            </div>
-          </div>
+      {!hydrated ? (
+        <div className="mt-16 min-h-[40svh]" />
+      ) : lines.length === 0 ? (
+        <div className="mt-16 grid min-h-[40svh] content-center gap-5 bg-surface p-8 md:p-14">
+          <p className="type-head text-head max-w-[14ch]">{t.bag.empty}</p>
+          <p className="max-w-[40ch]">{t.bag.emptyNote}</p>
+          <Link href={`/${lang}/shop`} className={cn(buttonVariants({ size: "lg" }), "justify-self-start")}>
+            {t.bag.browse}
+          </Link>
         </div>
-      </div>
+      ) : (
+        <div className="mt-16 grid gap-16 lg:grid-cols-12 lg:gap-x-(--gutter)">
+          <div className="lg:col-span-7">
+            <BagLines lang={lang} />
+          </div>
+          <aside className="lg:col-span-4 lg:col-start-9" aria-labelledby="summary-title">
+            <div className="grid gap-6 bg-surface p-6 md:p-8 lg:sticky lg:top-[calc(var(--header)+1.5rem)]">
+              <h2 id="summary-title" className="type-lead text-lead font-medium">
+                {t.cartPage.summary}
+              </h2>
+              <dl className="tabular grid gap-3">
+                <div className="flex justify-between">
+                  <dt>{t.checkout.subtotal}</dt>
+                  <dd>{formatYen(totals.subtotal)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>{t.cartPage.shipping}</dt>
+                  <dd>{totals.shipping === 0 ? t.cartPage.free : formatYen(totals.shipping)}</dd>
+                </div>
+                <div className="flex justify-between pt-3 text-lead font-medium">
+                  <dt>{t.cartPage.total}</dt>
+                  <dd>{formatYen(totals.total)}</dd>
+                </div>
+              </dl>
+              <FreeShippingNote lang={lang} subtotal={totals.subtotal} />
+              <Link href={`/${lang}/checkout`} className={cn(buttonVariants({ size: "lg" }), "w-full")}>
+                {t.bag.checkout}
+              </Link>
+              <Link href={`/${lang}/shop`} className="link-quiet justify-self-start underline">
+                {t.cartPage.continue}
+              </Link>
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
