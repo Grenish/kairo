@@ -4,27 +4,28 @@ import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+// Flat, square-cornered, one fill. Surfaces are told apart by tone, never by an outline.
 const buttonVariants = cva(
-  "focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-xs/relaxed font-medium focus-visible:ring-[2px] aria-invalid:ring-[2px] [&_svg:not([class*='size-'])]:size-4 inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none group/button select-none",
+  "press inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-medium tracking-[-0.01em] select-none outline-none disabled:pointer-events-none disabled:opacity-45 aria-invalid:outline-2 aria-invalid:outline-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 group/button",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline: "border-border dark:bg-input/20 dark:bg-input/30 hover:bg-input/50 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost: "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground",
-        destructive: "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
-        link: "text-primary underline-offset-4 hover:underline",
+        default: "bg-primary text-primary-foreground hover:bg-primary/88",
+        outline: "bg-surface text-foreground hover:bg-surface-2 aria-expanded:bg-surface-2",
+        secondary: "bg-surface text-foreground hover:bg-surface-2 aria-expanded:bg-surface-2",
+        ghost: "text-foreground hover:bg-surface aria-expanded:bg-surface",
+        destructive: "bg-surface text-destructive hover:bg-surface-2",
+        link: "text-foreground underline decoration-transparent decoration-[0.07em] underline-offset-[0.22em] hover:decoration-current",
       },
       size: {
-        default: "h-7 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        xs: "h-5 gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-2.5",
-        sm: "h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        lg: "h-8 gap-1 px-2.5 text-xs/relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-4",
-        icon: "size-7 [&_svg:not([class*='size-'])]:size-3.5",
-        "icon-xs": "size-5 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
-        "icon-sm": "size-6 [&_svg:not([class*='size-'])]:size-3",
-        "icon-lg": "size-8 [&_svg:not([class*='size-'])]:size-4",
+        default: "h-12 px-6",
+        xs: "h-8 px-3 text-[0.875rem]",
+        sm: "h-10 px-4 text-[0.9375rem]",
+        lg: "h-14 px-8",
+        icon: "size-11",
+        "icon-xs": "size-8",
+        "icon-sm": "size-10",
+        "icon-lg": "size-12",
       },
     },
     defaultVariants: {

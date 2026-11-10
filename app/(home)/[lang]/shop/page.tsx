@@ -1,77 +1,94 @@
 import type { Metadata } from "next";
-import { Product } from "@/components/product-card";
-import { ShopInterface } from "@/components/shop/shop-interface";
-import { dict } from "@/lib/dict";
-import { getAllProducts } from "@/lib/products";
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import { ShopInterface, type SortKey } from "@/components/shop/shop-interface";
+import { dict } from "@/lib/dict";
+import { isLocale } from "@/lib/i18n";
+import { CATEGORIES, getProducts, type Category } from "@/lib/catalog";
 
-export const metadata: Metadata = {
-  title: "Shop",
-  description:
-    "Shop the full Kairo collection of Japanese-crafted apparel. Filter by category and price to find timeless pieces made to last.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+  return { title: dict[lang].shop.title, description: dict[lang].shop.intro };
+}
+
+const SOON = ["/soon/gown.png", "/soon/kimono.png", "/soon/yellow-dress.png", "/soon/pants.png"];
 
 export default async function ShopPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ lang: "en" | "ja" }>;
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { lang } = await params;
-  const t = dict[lang];
+  if (!isLocale(lang)) notFound();
+  const query = await searchParams;
+  const t = dict[lang].shop;
 
-  if (!t) return notFound();
+  const pick = (key: string) => {
+    const value = query[key];
+    return typeof value === "string" ? value : undefined;
+  };
+  const category = pick("category")?.toLowerCase();
+  const sort = pick("sort");
 
-  // Combine products - Use getAllProducts to ensure slugs are consistent (Latin for JP)
-  const allProducts = getAllProducts(lang);
-
-  const pageTitle = lang === "ja" ? "ショップ" : "Shop";
-  const pageDescription =
-    lang === "ja"
-      ? "私たちのコレクションをご覧ください。"
-      : "Explore our collection.";
-
-  // Localized UI strings for the interface
-  const interfaceText = {
-    addToCart: t.productsSample.addToCart,
-    filters: lang === "ja" ? "フィルター" : "Filters",
-    sort: lang === "ja" ? "並び替え" : "Sort",
-    sortBy: {
-      newest: lang === "ja" ? "新着順" : "Newest Arrivals",
-      priceLowToHigh: lang === "ja" ? "価格の安い順" : "Price: Low to High",
-      priceHighToLow: lang === "ja" ? "価格の高い順" : "Price: High to Low",
-    },
-    category: lang === "ja" ? "カテゴリー" : "Category",
-    priceRange: lang === "ja" ? "価格帯" : "Price Range",
-    clearFilters: lang === "ja" ? "フィルターをクリア" : "Clear Filters",
-    results: lang === "ja" ? "件の結果" : "results",
-    categories:
-      lang === "ja"
-        ? {
-            Suits: "スーツ",
-            Dresses: "ドレス",
-            Tops: "トップス",
-            Bottoms: "ボトムス",
-            Knitwear: "ニット",
-            Outerwear: "アウター",
-            Other: "その他",
-          }
-        : undefined,
+  const initial = {
+    category: CATEGORIES.includes(category as Category) ? (category as Category) : null,
+    size: pick("size")?.toUpperCase() ?? null,
+    sort: (sort === "price-asc" || sort === "price-desc" ? sort : "new") as SortKey,
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 md:px-6">
-      <div className="max-w-8xl mx-auto space-y-12">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            {pageTitle}
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {pageDescription}
+    <>
+      <section className="wrap grid gap-6 pt-12 pb-14 lg:grid-cols-12 lg:items-end lg:gap-x-(--gutter) lg:pt-20 lg:pb-20">
+        <h1 className="type-display text-display -ml-[0.04em] lg:col-span-7">
+          <span className="line-mask">
+            <span className="load-line">{t.title}</span>
+          </span>
+        </h1>
+        <p
+          className="load-rise type-lead text-lead max-w-[32ch] lg:col-span-4 lg:col-start-9"
+          style={{ "--d": "300ms" } as React.CSSProperties}
+        >
+          {t.intro}
+        </p>
+      </section>
+
+      <ShopInterface lang={lang} products={getProducts(lang)} initial={initial} />
+
+      <section aria-labelledby="soon-title" className="wrap mt-32 lg:mt-48">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-x-(--gutter)">
+          <h2 id="soon-title" className="type-head text-head lg:col-span-6" data-reveal>
+            {t.next}
+          </h2>
+          <p className="max-w-[40ch] lg:col-span-4 lg:col-start-9 lg:self-end" data-reveal>
+            {t.nextNote}
           </p>
         </div>
-
-        <ShopInterface products={allProducts} t={interfaceText} lang={lang} />
-      </div>
-    </div>
+        <ul className="mt-12 grid grid-cols-2 gap-(--gutter) lg:grid-cols-4">
+          {SOON.map((src, i) => (
+            <li
+              key={src}
+              className="relative aspect-[3/4] overflow-hidden bg-paper"
+              data-reveal="mask"
+              style={{ "--d": `${i * 90}ms` } as React.CSSProperties}
+            >
+              <Image
+                src={src}
+                alt={t.nextAlt[i]}
+                fill
+                sizes="(min-width: 1024px) 25vw, 50vw"
+                className="object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
 }

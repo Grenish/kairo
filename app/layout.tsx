@@ -1,32 +1,40 @@
-import type { Metadata } from "next";
-import { Nunito_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Hanken_Grotesk, Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/components/providers/cart-provider";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
+import { RevealObserver } from "@/components/providers/reveal-observer";
 
-const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
+const hanken = Hanken_Grotesk({
+  variable: "--font-hanken",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// Kanji and kana fall through to this face; the Latin glyphs stay in Hanken Grotesk.
+const zen = Zen_Kaku_Gothic_New({
+  variable: "--font-zen",
+  weight: ["400", "500"],
+  display: "swap",
+  preload: false,
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
   title: {
-    default: "Kairo | Japanese Fashion and Quiet Luxury",
-    template: "%s | Kairo",
+    default: "Kairo — clothing from Tokyo, named for one word each",
+    template: "%s — Kairo",
   },
   description:
-    "Kairo redefines luxury through Japanese craftsmanship and timeless design. Shop curated apparel, read our journal, and discover quiet luxury.",
-  applicationName: "Kairo",
-  openGraph: {
-    type: "website",
-    siteName: "Kairo",
-    title: "Kairo | Japanese Fashion and Quiet Luxury",
-    description:
-      "Kairo redefines luxury through Japanese craftsmanship and timeless design. Shop curated apparel and discover quiet luxury.",
-    images: ["/story.png"],
-  },
-  twitter: { card: "summary_large_image" },
+    "Tailoring, knitwear and kimono cut in Tokyo. Every Kairo piece is named for one Japanese word.",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#151d33" },
+    { media: "(prefers-color-scheme: light)", color: "#151d33" },
+  ],
 };
 
 export default function RootLayout({
@@ -35,16 +43,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
-      <body className={`antialiased`}>
+    <html
+      lang="en"
+      className={`${hanken.variable} ${zen.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
+      </head>
+      <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >
           <SmoothScrollProvider>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+              {children}
+              <RevealObserver />
+            </CartProvider>
           </SmoothScrollProvider>
         </ThemeProvider>
       </body>
